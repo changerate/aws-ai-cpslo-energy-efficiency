@@ -8,24 +8,88 @@ cols = cols.split('\t')
 cols2 = []
 
 
+"""
+FINDING THE UNIQUE COLUMNS
+"""
+# for idx, col in enumerate(cols): 
+#     colSplit = re.split(r'^[A-Za-z0-9]{5}\s', col)
+
+#     if len(colSplit) == 2:
+#         cols2 += [colSplit[1]]
+#         print(f"{idx+1}.\t{colSplit[1]}")
+
+#     elif len(colSplit) == 1: 
+#         cols2 += [colSplit[0]]
+#         print(f"{idx+1}.\t{colSplit[0]}")
+
+
+# print(f"Number cols: {len(cols2)}")
+# print(f"Number unique: {len(set(cols2))}")
+
+# print(f"\n\nThese are the unique cols:\n")
+# for idx, col in enumerate(set(cols2)):
+#     print(f"{idx + 1}.\t{col}")
+
+
+
+
+
+
+"""
+FINDING THE UNQIUE BUILDINGS
+"""
+uniqueBuildings = set()
 for idx, col in enumerate(cols): 
-    colSplit = re.split(r'^[A-Za-z0-9]{5}\s', col)
-
-    if len(colSplit) == 2:
-        cols2 += [colSplit[1]]
-        print(f"{idx+1}\t{colSplit[1]}")
-
-    elif len(colSplit) == 1: 
-        cols2 += [colSplit[0]]
-        print(f"{idx+1}\t{colSplit[0]}")
+    bldg = re.findall(r'^[A-Za-z0-9]{5}\s', col)
     
+    if len(bldg) == 1 and 'total' not in bldg[0].lower():
+        print(f"Bldg: {bldg}")
+        uniqueBuildings.add(bldg[0])
+        # uniqueBuildings.add(bldg[0].trim())
     
+print(f"\n\nThe unique buildings are:\n")
+for bldg in sorted(uniqueBuildings):
+    print(f"{bldg}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# cols = {
+#     "Timestamp" : "time...",
+#     "HHW" : "Heating Hot Water Loop",
+#     "CHW" : "Chilled Water Loop",
+#     "AHUs" : "Air Hnadling Units",
     
-print(f"Number cols: {len(cols2)}")
-print(f"Number unique: {len(set(cols2))}")
-
-
-
-print(f"\n\nThese are the unique cols:\n")
-for idx, col in enumerate(set(cols2)):
-    print(f"{idx + 1}.\t{col}")
+#     "Building HHW Loop HHW Return Temp" : "",
+#     "Building HHW Loop HHW Supply Flow" : "",
+#     "Building HHW Loop HHW Supply Temp" : "",
+#     "Cooling Valve Cmd" : "",
+#     "Heating Valve Cmd" : "",
+#     "Outside Air Temp" : "",
+#     "Return Air Fan Command (C)" : "",
+#     "Supply Air Fan Command (C)" : "",
+#     "Pump Speed Status" : "",
+#     "Pump Speed Status" : "",
+#     "Pump Speed Status" : "",
+#     "N4-CHW-MTR: Main Usage (kBTU)" : "",
+#     "N4-HHW-MTR: Main Usage (kBTU)" : "",
+#     "Tertiary CHW Loop CHW Return Temp" : "",
+#     "Tertiary CHW Loop CHW Supply Flow" : "",
+#     "Tertiary CHW Loop CHW Supply Temp" : "",
+#     "Total Electric Demand (C)" : "",
+#     "Total Electric Usage (C)" : "",
+#     "Total Natural Gas Usage (C)" : "",
+# }
