@@ -22,14 +22,34 @@ def cleanExcel(excelFileName: str) -> None:
 
     # Save
     saveFile = "./cleaned_data/" + excelFileName.strip('.xlsx') + ".csv"
-    df_cleaned.to_csv(saveFile, index=False)
+    print(f"Saving to: {saveFile} ", end='')
+    try: 
+        df_cleaned.to_csv(saveFile, index=False)
+    except: 
+        print(f"✖︎")
+        return None
+    
+    
+    print(f"✔︎")
 
-    print(f"Saved to: {saveFile}")
 
 
 
 
 
+
+
+def multiExcelCleaning(excelList: list[str]) -> None:
+    print(f"\nCleaning {len(excelList)} excel files!\n")
+
+    for file in excelList:
+        cleanExcel(file.strip())
+
+    print(f"\n\nFinished cleaning! 🧼")
+    
+    
+    
+    
 
 
 
@@ -83,9 +103,4 @@ allExcelFiles = [
 'HistorianTable 9-2023.xlsx',
 'HistorianTable 9-2024.xlsx',
 ]
-
-
-for file in allExcelFiles:
-    cleanExcel(file.strip())
-
-print(f"\n\nFinished cleaning! 🧼")
+multiExcelCleaning(allExcelFiles)
