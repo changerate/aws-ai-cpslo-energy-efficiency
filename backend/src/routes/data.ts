@@ -177,6 +177,39 @@ router.get('/rates', (req: Request, res: Response) => {
   }
 });
 
+// GET /api/data/savings - Get energy savings comparison with previous year
+router.get('/savings', async (req: Request, res: Response) => {
+  try {
+    const { building, timeframe } = req.query;
+    
+    const validTimeframes = ['day', 'week', 'month'];
+    const selectedTimeframe = (typeof timeframe === 'string' && validTimeframes.includes(timeframe)) 
+      ? timeframe as 'day' | 'week' | 'month' 
+      : 'day';
+    
+    const savingsData = await csvService.getSavingsComparison(
+      building as string | undefined, 
+      selectedTimeframe
+    );
+    
+    const response: ApiResponse<typeof savingsData> = {
+      success: true,
+      data: savingsData,
+      message: `Savings comparison retrieved successfully${building ? ` for building ${building}` : ''} (${selectedTimeframe})`,
+      timestamp: new Date().toISOString()
+    };
+    
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: `Error retrieving savings data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // GET /api/data/csv-info - Get CSV file information
 router.get('/csv-info', async (req: Request, res: Response) => {
   try {

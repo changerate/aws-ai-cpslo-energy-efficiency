@@ -55,6 +55,16 @@ export async function fetchRateData(): Promise<ApiResponse<RateData[]>> {
   return fetchApi<RateData[]>('/data/rates');
 }
 
+// Fetch energy savings comparison
+export async function fetchSavingsComparison(building?: string, timeframe?: string): Promise<ApiResponse<any>> {
+  const params = new URLSearchParams();
+  if (building) params.append('building', building);
+  if (timeframe) params.append('timeframe', timeframe);
+  
+  const endpoint = `/data/savings${params.toString() ? `?${params.toString()}` : ''}`;
+  return fetchApi<any>(endpoint);
+}
+
 // Fetch CSV file information
 export async function fetchCSVInfo(): Promise<ApiResponse<any>> {
   return fetchApi<any>('/data/csv-info');

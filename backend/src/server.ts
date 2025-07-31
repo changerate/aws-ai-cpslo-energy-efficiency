@@ -67,11 +67,12 @@ const startServer = (): void => {
     console.log(`   GET /api/data/hvac-systems - Get HVAC systems data`);
     console.log(`   GET /api/data/hvac-schedule - Get HVAC maintenance schedule`);
     console.log(`   GET /api/data/energy-usage - Get energy usage data (from CSV)`);
+    console.log(`   GET /api/data/savings - Get energy savings comparison with previous year`);
     console.log(`   GET /api/data/csv-info - Get CSV file information`);
     console.log(`   POST /api/data/csv-path - Set custom CSV file path`);
     console.log(`   GET /api/data/rates - Get rate data`);
     console.log(`   GET /api/data/summary - Get data summary`);
-    console.log(`📁 CSV file location: ~/Documents/energy_data.csv`);
+    console.log(`📁 CSV file location: ~/Documents/cl-combinedHistoricalData.csv`);
   });
 };
 
