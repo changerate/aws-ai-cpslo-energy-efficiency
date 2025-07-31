@@ -1,8 +1,12 @@
 import express, { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import dataRoutes from './data';
 
 const router = express.Router();
+
+// Mount data routes
+router.use('/data', dataRoutes);
 
 // GET /api/time - Returns current time
 router.get('/time', (req: Request, res: Response) => {

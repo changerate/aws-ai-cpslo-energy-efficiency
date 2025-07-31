@@ -63,6 +63,10 @@ const startServer = (): void => {
     console.log(`📋 API endpoints:`);
     console.log(`   GET /api/time - Get current time`);
     console.log(`   GET /api/hello - Hello world`);
+    console.log(`   GET /api/data/class-schedules - Get class schedule data`);
+    console.log(`   GET /api/data/energy-usage - Get energy usage data`);
+    console.log(`   GET /api/data/rates - Get rate data`);
+    console.log(`   GET /api/data/summary - Get data summary`);
   });
 };
 
