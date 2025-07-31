@@ -1,0 +1,7 @@
+pandas
+openpyxl
+re
+boto3 
+sagemaker
+joblib
+sklearn
