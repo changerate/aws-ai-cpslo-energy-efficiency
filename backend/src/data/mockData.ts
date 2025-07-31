@@ -1,4 +1,4 @@
-import { ClassSchedule, EnergyUsage, RateData } from '../types';
+import { ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '../types';
 
 // Mock Class Schedule Data
 export const mockClassSchedules: ClassSchedule[] = [
@@ -41,11 +41,134 @@ export const mockClassSchedules: ClassSchedule[] = [
     className: 'Data Structures',
     roomNumber: '220',
     buildingNumber: '26'
+  },
+  {
+    id: 6,
+    date: '2025-08-01',
+    time: '11:00',
+    className: 'Chemistry Lab',
+    roomNumber: '101',
+    buildingNumber: '52'
+  },
+  {
+    id: 7,
+    date: '2025-08-01',
+    time: '15:30',
+    className: 'Biology 101',
+    roomNumber: '205',
+    buildingNumber: '14'
+  },
+  {
+    id: 8,
+    date: '2025-08-01',
+    time: '08:00',
+    className: 'Statistics',
+    roomNumber: '110',
+    buildingNumber: '26'
   }
 ];
 
+// Mock HVAC Systems Data
+export const mockHVACSystems: HVACSystem[] = [
+  // Building 14 HVAC Systems
+  { id: 1, systemName: 'HVAC-1', buildingNumber: '14', zones: ['201-210', '211-220'] },
+  { id: 2, systemName: 'HVAC-2', buildingNumber: '14', zones: ['150-160', '161-170'] },
+  { id: 3, systemName: 'HVAC-3', buildingNumber: '14', zones: ['200-210', '211-220'] },
+  { id: 4, systemName: 'HVAC-4', buildingNumber: '14', zones: ['171-180', '181-190'] },
+  { id: 5, systemName: 'HVAC-5', buildingNumber: '14', zones: ['191-210', '211-230'] },
+  
+  // Building 26 HVAC Systems
+  { id: 6, systemName: 'HVAC-1', buildingNumber: '26', zones: ['100-115', '116-130'] },
+  { id: 7, systemName: 'HVAC-2', buildingNumber: '26', zones: ['105-120', '121-135'] },
+  { id: 8, systemName: 'HVAC-3', buildingNumber: '26', zones: ['210-225', '226-240'] },
+  { id: 9, systemName: 'HVAC-4', buildingNumber: '26', zones: ['241-255', '256-270'] },
+  { id: 10, systemName: 'HVAC-5', buildingNumber: '26', zones: ['271-285', '286-300'] },
+  
+  // Building 52 HVAC Systems
+  { id: 11, systemName: 'HVAC-1', buildingNumber: '52', zones: ['100-115', '116-130'] },
+  { id: 12, systemName: 'HVAC-2', buildingNumber: '52', zones: ['300-315', '316-330'] },
+  { id: 13, systemName: 'HVAC-3', buildingNumber: '52', zones: ['331-345', '346-360'] },
+  { id: 14, systemName: 'HVAC-4', buildingNumber: '52', zones: ['361-375', '376-390'] },
+  { id: 15, systemName: 'HVAC-5', buildingNumber: '52', zones: ['391-405', '406-420'] }
+];
+
+// Generate HVAC Schedule based on class schedules
+export const generateHVACSchedule = (): HVACSchedule[] => {
+  const schedules: HVACSchedule[] = [];
+  const buildings = ['14', '26', '52'];
+  
+  // Generate time slots from 7:00 AM to 10:00 PM in 30-minute increments
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 7; hour <= 22; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (hour === 22 && minute > 0) break; // Stop at 10:00 PM
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        slots.push(timeString);
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+  
+  buildings.forEach(buildingNumber => {
+    const buildingHVACs = mockHVACSystems.filter(hvac => hvac.buildingNumber === buildingNumber);
+    const buildingClasses = mockClassSchedules.filter(cls => cls.buildingNumber === buildingNumber);
+    
+    buildingHVACs.forEach(hvac => {
+      timeSlots.forEach(timeSlot => {
+        // Check if there's a class during this time slot that affects this HVAC system
+        const hasActiveClass = buildingClasses.some(cls => {
+          const classTime = cls.time;
+          const classTimeParts = classTime.split(':');
+          const classHour = parseInt(classTimeParts[0] || '0');
+          const classMinute = parseInt(classTimeParts[1] || '0');
+          const timeSlotParts = timeSlot.split(':');
+          const slotHour = parseInt(timeSlotParts[0] || '0');
+          const slotMinute = parseInt(timeSlotParts[1] || '0');
+          
+          // Assume each class runs for 1.5 hours
+          const classStartMinutes = classHour * 60 + classMinute;
+          const classEndMinutes = classStartMinutes + 90; // 1.5 hours
+          const slotMinutes = slotHour * 60 + slotMinute;
+          
+          // Check if the room is in the HVAC zone and if the time overlaps
+          const roomNumber = cls.roomNumber;
+          const isInZone = hvac.zones.some(zone => {
+            const zoneParts = zone.split('-');
+            const start = parseInt(zoneParts[0] || '0');
+            const end = parseInt(zoneParts[1] || '0');
+            const room = parseInt(roomNumber);
+            return room >= start && room <= end;
+          });
+          
+          return isInZone && slotMinutes >= classStartMinutes && slotMinutes < classEndMinutes;
+        });
+        
+        schedules.push({
+          id: schedules.length + 1,
+          hvacSystemId: hvac.id,
+          buildingNumber,
+          systemName: hvac.systemName,
+          timeSlot,
+          shouldBeOn: hasActiveClass,
+          hasActiveClass,
+          date: '2025-08-01'
+        });
+      });
+    });
+  });
+  
+  return schedules;
+};
+
+// Generate fresh energy data each time
+export const mockEnergyUsage = generateMockEnergyUsage();
+export const mockHVACSchedules = generateHVACSchedule();
+
 // Generate mock energy usage data (15-minute intervals)
-export const generateMockEnergyUsage = (): EnergyUsage[] => {
+export function generateMockEnergyUsage(): EnergyUsage[] {
   const data: EnergyUsage[] = [];
   const baseDate = new Date('2025-08-01T00:00:00');
   const buildings = ['14', '26', '52'];
@@ -69,7 +192,7 @@ export const generateMockEnergyUsage = (): EnergyUsage[] => {
   });
   
   return data.sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
-};
+}
 
 // Mock Rate Data
 export const mockRateData: RateData[] = [
@@ -104,6 +227,3 @@ export const mockRateData: RateData[] = [
     description: 'Federal holidays and weekends'
   }
 ];
-
-// Generate fresh energy data each time
-export const mockEnergyUsage = generateMockEnergyUsage();

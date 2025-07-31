@@ -1,4 +1,4 @@
-import ClassScheduleChart from '@/components/ClassScheduleChart';
+import HVACMaintenanceSchedule from '@/components/HVACMaintenanceSchedule';
 import EnergyUsageChart from '@/components/EnergyUsageChart';
 import RateDataChart from '@/components/RateDataChart';
 import { Activity, BarChart3 } from 'lucide-react';
@@ -31,25 +31,25 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-lg shadow-lg">
             <h2 className="text-3xl font-bold mb-2">Welcome to the Energy Dashboard</h2>
             <p className="text-blue-100">
-              Monitor class schedules, energy usage, and electricity rates across campus buildings in real-time.
+              Monitor HVAC maintenance schedules, energy usage, and electricity rates across campus buildings in real-time.
             </p>
           </div>
 
           {/* Charts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Class Schedule Chart */}
-            <div className="lg:col-span-1">
-              <ClassScheduleChart />
-            </div>
-
             {/* Rate Data Chart */}
             <div className="lg:col-span-1">
               <RateDataChart />
             </div>
 
-            {/* Energy Usage Chart - Full Width */}
-            <div className="lg:col-span-2">
+            {/* Energy Usage Chart */}
+            <div className="lg:col-span-1">
               <EnergyUsageChart />
+            </div>
+
+            {/* HVAC Maintenance Schedule - Full Width */}
+            <div className="lg:col-span-2">
+              <HVACMaintenanceSchedule />
             </div>
           </div>
 
@@ -57,9 +57,9 @@ export default function Dashboard() {
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
               <div>
-                <h3 className="font-semibold text-gray-700 mb-2">Class Schedules</h3>
+                <h3 className="font-semibold text-gray-700 mb-2">HVAC Maintenance</h3>
                 <p className="text-sm text-gray-500">
-                  Track classroom usage across campus buildings to optimize energy consumption during class hours.
+                  Track HVAC system schedules across campus buildings to optimize maintenance timing and energy consumption.
                 </p>
               </div>
               <div>

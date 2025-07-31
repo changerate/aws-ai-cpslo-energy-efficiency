@@ -24,6 +24,26 @@ export interface RateData {
   description: string;
 }
 
+// HVAC System Types
+export interface HVACSystem {
+  id: number;
+  systemName: string;
+  buildingNumber: string;
+  zones: string[]; // Array of room ranges like ["201-210", "211-220"]
+}
+
+// HVAC Schedule Types
+export interface HVACSchedule {
+  id: number;
+  hvacSystemId: number;
+  buildingNumber: string;
+  systemName: string;
+  timeSlot: string; // Format: "HH:MM"
+  shouldBeOn: boolean;
+  hasActiveClass: boolean;
+  date: string;
+}
+
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;

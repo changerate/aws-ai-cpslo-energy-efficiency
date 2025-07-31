@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { mockClassSchedules, mockEnergyUsage, mockRateData } from '../data/mockData';
-import { ApiResponse, ClassSchedule, EnergyUsage, RateData } from '../types';
+import { mockClassSchedules, mockEnergyUsage, mockRateData, mockHVACSystems, mockHVACSchedules } from '../data/mockData';
+import { ApiResponse, ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '../types';
 
 const router = express.Router();
 
@@ -20,6 +20,71 @@ router.get('/class-schedules', (req: Request, res: Response) => {
       success: false,
       data: [],
       message: `Error retrieving class schedules: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// GET /api/data/hvac-systems - Get all HVAC systems
+router.get('/hvac-systems', (req: Request, res: Response) => {
+  try {
+    const { building } = req.query;
+    
+    let filteredData = mockHVACSystems;
+    
+    // Filter by building if specified
+    if (building && typeof building === 'string') {
+      filteredData = mockHVACSystems.filter(hvac => hvac.buildingNumber === building);
+    }
+    
+    const response: ApiResponse<HVACSystem[]> = {
+      success: true,
+      data: filteredData,
+      message: `HVAC systems retrieved successfully${building ? ` for building ${building}` : ''}`,
+      timestamp: new Date().toISOString()
+    };
+    
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: [],
+      message: `Error retrieving HVAC systems: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// GET /api/data/hvac-schedule - Get HVAC maintenance schedule
+router.get('/hvac-schedule', (req: Request, res: Response) => {
+  try {
+    const { building, system } = req.query;
+    
+    let filteredData = mockHVACSchedules;
+    
+    // Filter by building if specified
+    if (building && typeof building === 'string') {
+      filteredData = filteredData.filter(schedule => schedule.buildingNumber === building);
+    }
+    
+    // Filter by system if specified
+    if (system && typeof system === 'string') {
+      filteredData = filteredData.filter(schedule => schedule.systemName === system);
+    }
+    
+    const response: ApiResponse<HVACSchedule[]> = {
+      success: true,
+      data: filteredData,
+      message: `HVAC schedule retrieved successfully${building ? ` for building ${building}` : ''}${system ? ` system ${system}` : ''}`,
+      timestamp: new Date().toISOString()
+    };
+    
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: [],
+      message: `Error retrieving HVAC schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
       timestamp: new Date().toISOString()
     });
   }
@@ -84,6 +149,14 @@ router.get('/summary', (req: Request, res: Response) => {
         count: mockClassSchedules.length,
         buildings: [...new Set(mockClassSchedules.map(cs => cs.buildingNumber))],
         dates: [...new Set(mockClassSchedules.map(cs => cs.date))]
+      },
+      hvacSystems: {
+        count: mockHVACSystems.length,
+        buildings: [...new Set(mockHVACSystems.map(hvac => hvac.buildingNumber))],
+        systemsPerBuilding: mockHVACSystems.reduce((acc, hvac) => {
+          acc[hvac.buildingNumber] = (acc[hvac.buildingNumber] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
       },
       energyUsage: {
         count: mockEnergyUsage.length,

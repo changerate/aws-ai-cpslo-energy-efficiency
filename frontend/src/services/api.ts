@@ -1,4 +1,4 @@
-import { ApiResponse, ClassSchedule, EnergyUsage, RateData } from '@/types';
+import { ApiResponse, ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3100/api';
 
@@ -22,6 +22,22 @@ async function fetchApi<T>(endpoint: string): Promise<ApiResponse<T>> {
 // Fetch class schedules
 export async function fetchClassSchedules(): Promise<ApiResponse<ClassSchedule[]>> {
   return fetchApi<ClassSchedule[]>('/data/class-schedules');
+}
+
+// Fetch HVAC systems
+export async function fetchHVACSystems(building?: string): Promise<ApiResponse<HVACSystem[]>> {
+  const endpoint = building ? `/data/hvac-systems?building=${building}` : '/data/hvac-systems';
+  return fetchApi<HVACSystem[]>(endpoint);
+}
+
+// Fetch HVAC schedule
+export async function fetchHVACSchedule(building?: string, system?: string): Promise<ApiResponse<HVACSchedule[]>> {
+  const params = new URLSearchParams();
+  if (building) params.append('building', building);
+  if (system) params.append('system', system);
+  
+  const endpoint = `/data/hvac-schedule${params.toString() ? `?${params.toString()}` : ''}`;
+  return fetchApi<HVACSchedule[]>(endpoint);
 }
 
 // Fetch energy usage data
