@@ -36,19 +36,19 @@ export default function Dashboard() {
           </div>
 
           {/* Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Rate Data Chart */}
             <div className="lg:col-span-1">
               <RateDataChart />
             </div>
 
-            {/* Energy Usage Chart */}
-            <div className="lg:col-span-1">
+            {/* Energy Usage Chart - Takes 2 columns */}
+            <div className="lg:col-span-2">
               <EnergyUsageChart />
             </div>
 
             {/* HVAC Maintenance Schedule - Full Width */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <HVACMaintenanceSchedule />
             </div>
           </div>

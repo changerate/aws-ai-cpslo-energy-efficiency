@@ -175,18 +175,29 @@ export function generateMockEnergyUsage(): EnergyUsage[] {
   
   let id = 1;
   
-  // Generate data for each building for 5 time intervals (75 minutes total)
+  // Generate data for each building for a full day (96 intervals of 15 minutes)
   buildings.forEach(building => {
-    for (let i = 0; i < 5; i++) {
+    const baseUsage = building === '14' ? 35 : building === '26' ? 28 : 42;
+    
+    for (let i = 0; i < 96; i++) { // 24 hours * 4 (15-minute intervals per hour)
       const dateTime = new Date(baseDate.getTime() + (i * 15 * 60 * 1000)); // 15-minute intervals
-      const baseUsage = building === '14' ? 35 : building === '26' ? 28 : 42; // Different base usage per building
-      const variation = (Math.random() - 0.5) * 10; // ±5 kWh variation
+      const hour = dateTime.getHours();
+      
+      // Create realistic usage patterns based on time of day
+      let timeMultiplier = 1;
+      if (hour >= 6 && hour <= 8) timeMultiplier = 1.3; // Morning peak
+      else if (hour >= 9 && hour <= 17) timeMultiplier = 1.5; // Business hours
+      else if (hour >= 18 && hour <= 20) timeMultiplier = 1.2; // Evening
+      else if (hour >= 21 || hour <= 5) timeMultiplier = 0.6; // Night/early morning
+      
+      const variation = (Math.random() - 0.5) * 8; // ±4 kWh variation
+      const usage = baseUsage * timeMultiplier + variation;
       
       data.push({
         id: id++,
         dateTime: dateTime.toISOString(),
         buildingNumber: building,
-        energyUsedKwh: Math.round((baseUsage + variation) * 100) / 100 // Round to 2 decimal places
+        energyUsedKwh: Math.round(Math.max(usage, 5) * 100) / 100 // Minimum 5 kWh, round to 2 decimal places
       });
     }
   });

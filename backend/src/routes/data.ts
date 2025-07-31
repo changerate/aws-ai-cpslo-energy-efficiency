@@ -93,19 +93,37 @@ router.get('/hvac-schedule', (req: Request, res: Response) => {
 // GET /api/data/energy-usage - Get energy usage data
 router.get('/energy-usage', (req: Request, res: Response) => {
   try {
-    const { building } = req.query;
+    const { building, timeframe } = req.query;
     
     let filteredData = mockEnergyUsage;
     
     // Filter by building if specified
     if (building && typeof building === 'string') {
-      filteredData = mockEnergyUsage.filter(usage => usage.buildingNumber === building);
+      filteredData = filteredData.filter(usage => usage.buildingNumber === building);
+    }
+    
+    // Filter by timeframe if specified
+    if (timeframe && typeof timeframe === 'string') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      switch (timeframe) {
+        case 'today':
+          // Return data from today (already filtered by default mock data)
+          break;
+        case 'week':
+          // For demo purposes, return the same data but we could filter for last 7 days
+          break;
+        case 'month':
+          // For demo purposes, return the same data but we could filter for last 30 days
+          break;
+      }
     }
     
     const response: ApiResponse<EnergyUsage[]> = {
       success: true,
       data: filteredData,
-      message: `Energy usage data retrieved successfully${building ? ` for building ${building}` : ''}`,
+      message: `Energy usage data retrieved successfully${building ? ` for building ${building}` : ''}${timeframe ? ` (${timeframe})` : ''}`,
       timestamp: new Date().toISOString()
     };
     

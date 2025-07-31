@@ -41,8 +41,12 @@ export async function fetchHVACSchedule(building?: string, system?: string): Pro
 }
 
 // Fetch energy usage data
-export async function fetchEnergyUsage(building?: string): Promise<ApiResponse<EnergyUsage[]>> {
-  const endpoint = building ? `/data/energy-usage?building=${building}` : '/data/energy-usage';
+export async function fetchEnergyUsage(building?: string, timeframe?: string): Promise<ApiResponse<EnergyUsage[]>> {
+  const params = new URLSearchParams();
+  if (building) params.append('building', building);
+  if (timeframe) params.append('timeframe', timeframe);
+  
+  const endpoint = `/data/energy-usage${params.toString() ? `?${params.toString()}` : ''}`;
   return fetchApi<EnergyUsage[]>(endpoint);
 }
 
