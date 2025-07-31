@@ -2,7 +2,13 @@ import pandas as pd
 import os 
 
 
+HVAC_SYSTEM = 'AHU1A'
 
+def extend_with_hvac_units(df, selected_columns, pattern=HVAC_SYSTEM):
+    ahu_cols = [c for c in df.columns if pattern in c]
+
+    # preserve order, avoid duplicates
+    return list(dict.fromkeys(selected_columns + ahu_cols))
 
 
 
@@ -10,21 +16,22 @@ import os
 
 def reallyClean(file):
 
-    fileName = file.split('../Data/')
+    fileName = file.split('../../../Data/')
     fileName = fileName[1].split('.xlsx')[0]
 
 
     df = pd.read_excel(file)
 
-    selected_cols = ['Timestamp', ' Total Electric Usage (C)', ' Total Electric Demand (C)']
+    # select the columns 
+    selected_cols = extend_with_hvac_units(df, ['Timestamp', ' Total Electric Usage (C)', ' Total Electric Demand (C)'])
     df = df[selected_cols]
 
-    df = df[~df.drop(columns='Timestamp').isna().all(axis=1)]
+    df.drop(columns="  " + HVAC_SYSTEM + " Heating Valve Cmd", inplace=True)
+    # df = df[ ~ df.drop(columns='Timestamp').isna().all(axis=1)]
 
     df.to_csv("cleaned-data/cl-" + fileName + ".csv", index=False)
 
     print(f"Saved: {fileName + ".csv"}")
-
 
 
 
@@ -45,7 +52,66 @@ def combine_csvs(input_dir, output_file):
 
 
 
+
+def collapse_to_minute(file, timestamp_col='Timestamp', agg_map=None, drop_timestamp_seconds=True):
+
+    fileName = file.split('../../../Data/')
+    fileName = fileName[1].split('.xlsx')[0]
+
+    df = pd.read_excel(file)
+
+    # df = pd.read_csv(...)
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+
+    # normalize timezone / drop tz if any to avoid mismatch
+    df['Timestamp'] = df['Timestamp'].dt.tz_localize(None)
+
+    # bucket to minute
+    df['__minute'] = df['Timestamp'].dt.floor('T')  # 'T' == minute
+
+    # default agg: numeric -> mean, others -> first
+    agg_map = {
+        col: ('mean' if pd.api.types.is_numeric_dtype(df[col]) else 'first')
+        for col in df.columns
+        if col not in ('Timestamp', '__minute')
+    }
+
+    collapsed = df.groupby('__minute', as_index=False).agg(agg_map)
+    return collapsed.rename(columns={'__minute': 'Timestamp'})
+
+
+
+
+
+
+def saveDF(df, file): 
+    fileName = file.split('../../../Data/')
+    fileName = fileName[1].split('.xlsx')[0]
     
+    df.to_csv("cleaned-data/cl-" + fileName + ".csv", index=False)
+    print(f"Saved: {fileName + ".csv"}")
+
+
+
+
+
+
+
+
+def dropAndSave(df, file): 
+    fileName = file.split('../../../Data/')
+    fileName = fileName[1].split('.xlsx')[0]
+
+    # select the columns 
+    selected_cols = extend_with_hvac_units(df, ['Timestamp', ' Total Electric Usage (C)', ' Total Electric Demand (C)'])
+    df = df[selected_cols]
+
+    df.drop(columns="  " + HVAC_SYSTEM + " Heating Valve Cmd", inplace=True)
+    # df = df[ ~ df.drop(columns='Timestamp').isna().all(axis=1)]
+
+    df.to_csv("cleaned-data/cl-" + fileName + ".csv", index=False)
+
+
 
 
 allExcelFiles = [
@@ -107,11 +173,17 @@ allExcelFiles = [
 
 
 
+
+
+
+
+
 # for file in allExcelFiles: 
-#     reallyClean("../Data/" + file)
-    
-    
-# print(f"Finished converting")
+#     # reallyClean("../../../Data/" + file)
+#     dfCollapsed = collapse_to_minute('../../../Data/' + file)
+#     saveDF(dfCollapsed, '../../../Data/' + file)
+#     # dropAndSave(dfCollapsed)
+# print(f"\n\nFinished converting")
 
 
 combine_csvs('./cleaned-data/', 'cl-combinedHistoricalData.csv')
