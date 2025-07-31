@@ -11,6 +11,7 @@ import { notFound } from './middleware/notFound';
 
 // Import routes
 import apiRoutes from './routes/api';
+import energyRoutes from './routes/energy';
 
 // Load environment variables
 dotenv.config();
@@ -49,6 +50,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api', apiRoutes);
+app.use('/api/energy', energyRoutes);
 
 // Error handling middleware
 app.use(notFound);
@@ -63,6 +65,10 @@ const startServer = (): void => {
     console.log(`📋 API endpoints:`);
     console.log(`   GET /api/time - Get current time`);
     console.log(`   GET /api/hello - Hello world`);
+    console.log(`   GET /api/energy/usage - Get energy usage data`);
+    console.log(`   GET /api/energy/aggregated - Get aggregated energy data`);
+    console.log(`   GET /api/energy/metrics - Get efficiency metrics`);
+    console.log(`   GET /api/energy/dashboard - Get dashboard summary`);
   });
 };
 
