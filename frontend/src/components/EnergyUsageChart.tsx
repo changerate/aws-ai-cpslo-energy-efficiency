@@ -112,8 +112,16 @@ export default function EnergyUsageChart() {
     
     switch (selectedTimeFrame) {
       case 'day':
-        // Use existing 15-minute interval data
-        return baseData.map(usage => ({
+        // Use all existing 15-minute interval data for the full 24-hour period
+        // Sort by time to ensure proper chronological order
+        const sortedData = baseData
+          .filter(usage => {
+            const usageDate = new Date(usage.dateTime);
+            return usageDate.toDateString() === dataDate.toDateString();
+          })
+          .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+        
+        return sortedData.map(usage => ({
           time: new Date(usage.dateTime).toLocaleTimeString('en-US', { 
             hour: '2-digit', 
             minute: '2-digit' 

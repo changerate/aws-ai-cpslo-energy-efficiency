@@ -97,38 +97,51 @@ export default function EnergySavingsChart() {
     const chartPoints: ChartDataPoint[] = [];
 
     if (timeframe === 'day') {
-      // Group by hour for daily view
-      const hourlyData: { [hour: string]: { current: number[], previous: number[] } } = {};
+      // For daily view, show all 15-minute intervals throughout the full 24-hour period
+      // Create a complete 24-hour timeline
+      const fullDayTimeline: { [timeKey: string]: { current: number[], previous: number[] } } = {};
+      
+      // Initialize all 15-minute intervals for 24 hours
+      for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 15) {
+          const timeKey = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+          fullDayTimeline[timeKey] = { current: [], previous: [] };
+        }
+      }
 
+      // Populate with actual data
       currentYearData.forEach(d => {
-        const hour = new Date(d.dateTime).getHours().toString().padStart(2, '0') + ':00';
-        if (!hourlyData[hour]) hourlyData[hour] = { current: [], previous: [] };
-        hourlyData[hour].current.push(d.energyUsedKwh);
+        const date = new Date(d.dateTime);
+        const timeKey = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        if (fullDayTimeline[timeKey]) {
+          fullDayTimeline[timeKey].current.push(d.energyUsedKwh);
+        }
       });
 
       previousYearData.forEach(d => {
-        const hour = new Date(d.dateTime).getHours().toString().padStart(2, '0') + ':00';
-        if (!hourlyData[hour]) hourlyData[hour] = { current: [], previous: [] };
-        hourlyData[hour].previous.push(d.energyUsedKwh);
+        const date = new Date(d.dateTime);
+        const timeKey = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        if (fullDayTimeline[timeKey]) {
+          fullDayTimeline[timeKey].previous.push(d.energyUsedKwh);
+        }
       });
 
-      // Create chart data points
-      Object.keys(hourlyData).sort().forEach(hour => {
-        const currentAvg = hourlyData[hour].current.length > 0 
-          ? hourlyData[hour].current.reduce((sum, val) => sum + val, 0) / hourlyData[hour].current.length 
+      // Create chart data points for all time slots
+      Object.keys(fullDayTimeline).sort().forEach(timeKey => {
+        const currentAvg = fullDayTimeline[timeKey].current.length > 0 
+          ? fullDayTimeline[timeKey].current.reduce((sum, val) => sum + val, 0) / fullDayTimeline[timeKey].current.length 
           : 0;
-        const previousAvg = hourlyData[hour].previous.length > 0 
-          ? hourlyData[hour].previous.reduce((sum, val) => sum + val, 0) / hourlyData[hour].previous.length 
+        const previousAvg = fullDayTimeline[timeKey].previous.length > 0 
+          ? fullDayTimeline[timeKey].previous.reduce((sum, val) => sum + val, 0) / fullDayTimeline[timeKey].previous.length 
           : 0;
 
-        if (currentAvg > 0 || previousAvg > 0) {
-          chartPoints.push({
-            time: hour,
-            currentUsage: Math.round(currentAvg * 100) / 100,
-            previousYearUsage: Math.round(previousAvg * 100) / 100,
-            timestamp: `2025-06-15T${hour}:00.000Z`
-          });
-        }
+        // Include all time slots, even if no data (will show as 0)
+        chartPoints.push({
+          time: timeKey,
+          currentUsage: Math.round(currentAvg * 100) / 100,
+          previousYearUsage: Math.round(previousAvg * 100) / 100,
+          timestamp: `2025-06-15T${timeKey}:00.000Z`
+        });
       });
     } else if (timeframe === 'week') {
       // Generate daily data for week view
