@@ -55,6 +55,34 @@ export async function fetchRateData(): Promise<ApiResponse<RateData[]>> {
   return fetchApi<RateData[]>('/data/rates');
 }
 
+// Fetch CSV file information
+export async function fetchCSVInfo(): Promise<ApiResponse<any>> {
+  return fetchApi<any>('/data/csv-info');
+}
+
+// Set custom CSV file path
+export async function setCSVPath(filePath: string): Promise<ApiResponse<any>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/data/csv-path`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ filePath }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error setting CSV path:', error);
+    throw error;
+  }
+}
+
 // Fetch data summary
 export async function fetchDataSummary(): Promise<ApiResponse<any>> {
   return fetchApi<any>('/data/summary');

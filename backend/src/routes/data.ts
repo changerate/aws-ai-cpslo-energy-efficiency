@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
-import { mockClassSchedules, mockEnergyUsage, mockRateData, mockHVACSystems, mockHVACSchedules } from '../data/mockData';
+import { mockClassSchedules, mockRateData, mockHVACSystems, mockHVACSchedules } from '../data/mockData';
 import { ApiResponse, ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '../types';
+import { CSVService } from '../services/csvService';
 
 const router = express.Router();
+const csvService = CSVService.getInstance();
 
 // GET /api/data/class-schedules - Get all class schedules
 router.get('/class-schedules', (req: Request, res: Response) => {
@@ -91,15 +93,17 @@ router.get('/hvac-schedule', (req: Request, res: Response) => {
 });
 
 // GET /api/data/energy-usage - Get energy usage data
-router.get('/energy-usage', (req: Request, res: Response) => {
+router.get('/energy-usage', async (req: Request, res: Response) => {
   try {
-    const { building, timeframe } = req.query;
+    const { building, timeframe, reload } = req.query;
     
-    let filteredData = mockEnergyUsage;
+    // Get data from CSV service
+    const allEnergyData = await csvService.getEnergyData(reload === 'true');
+    let filteredData = allEnergyData;
     
     // Filter by building if specified
     if (building && typeof building === 'string') {
-      filteredData = filteredData.filter(usage => usage.buildingNumber === building);
+      filteredData = allEnergyData.filter(usage => usage.buildingNumber === building);
     }
     
     // Filter by timeframe if specified
@@ -109,13 +113,27 @@ router.get('/energy-usage', (req: Request, res: Response) => {
       
       switch (timeframe) {
         case 'today':
-          // Return data from today (already filtered by default mock data)
+          // Filter for today's data
+          filteredData = filteredData.filter(usage => {
+            const usageDate = new Date(usage.dateTime);
+            return usageDate >= today && usageDate < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+          });
           break;
         case 'week':
-          // For demo purposes, return the same data but we could filter for last 7 days
+          // Filter for last 7 days
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          filteredData = filteredData.filter(usage => {
+            const usageDate = new Date(usage.dateTime);
+            return usageDate >= weekAgo;
+          });
           break;
         case 'month':
-          // For demo purposes, return the same data but we could filter for last 30 days
+          // Filter for last 30 days
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          filteredData = filteredData.filter(usage => {
+            const usageDate = new Date(usage.dateTime);
+            return usageDate >= monthAgo;
+          });
           break;
       }
     }
@@ -123,7 +141,7 @@ router.get('/energy-usage', (req: Request, res: Response) => {
     const response: ApiResponse<EnergyUsage[]> = {
       success: true,
       data: filteredData,
-      message: `Energy usage data retrieved successfully${building ? ` for building ${building}` : ''}${timeframe ? ` (${timeframe})` : ''}`,
+      message: `Energy usage data retrieved successfully${building ? ` for building ${building}` : ''}${timeframe ? ` (${timeframe})` : ''} - ${filteredData.length} records`,
       timestamp: new Date().toISOString()
     };
     
@@ -159,9 +177,64 @@ router.get('/rates', (req: Request, res: Response) => {
   }
 });
 
-// GET /api/data/summary - Get summary of all data
-router.get('/summary', (req: Request, res: Response) => {
+// GET /api/data/csv-info - Get CSV file information
+router.get('/csv-info', async (req: Request, res: Response) => {
   try {
+    const summary = await csvService.getDataSummary();
+    
+    const response: ApiResponse<typeof summary> = {
+      success: true,
+      data: summary,
+      message: 'CSV file information retrieved successfully',
+      timestamp: new Date().toISOString()
+    };
+    
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: `Error retrieving CSV info: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// POST /api/data/csv-path - Set custom CSV file path
+router.post('/csv-path', (req: Request, res: Response) => {
+  try {
+    const { filePath } = req.body;
+    
+    if (!filePath || typeof filePath !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'File path is required and must be a string',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    csvService.setCsvFilePath(filePath);
+    
+    return res.json({
+      success: true,
+      message: `CSV file path updated to: ${filePath}`,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: `Error setting CSV path: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// GET /api/data/summary - Get summary of all data
+router.get('/summary', async (req: Request, res: Response) => {
+  try {
+    const energyData = await csvService.getEnergyData();
+    const csvSummary = await csvService.getDataSummary();
+    
     const summary = {
       classSchedules: {
         count: mockClassSchedules.length,
@@ -177,10 +250,12 @@ router.get('/summary', (req: Request, res: Response) => {
         }, {} as Record<string, number>)
       },
       energyUsage: {
-        count: mockEnergyUsage.length,
-        buildings: [...new Set(mockEnergyUsage.map(eu => eu.buildingNumber))],
-        totalEnergyKwh: mockEnergyUsage.reduce((sum, usage) => sum + usage.energyUsedKwh, 0),
-        averageEnergyKwh: mockEnergyUsage.reduce((sum, usage) => sum + usage.energyUsedKwh, 0) / mockEnergyUsage.length
+        count: energyData.length,
+        buildings: csvSummary.buildings,
+        totalEnergyKwh: energyData.reduce((sum, usage) => sum + usage.energyUsedKwh, 0),
+        averageEnergyKwh: csvSummary.avgUsage,
+        dateRange: csvSummary.dateRange,
+        dataSource: energyData.length > 0 ? 'CSV File' : 'Mock Data'
       },
       rates: {
         count: mockRateData.length,

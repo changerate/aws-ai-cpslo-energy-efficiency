@@ -170,7 +170,7 @@ export const mockHVACSchedules = generateHVACSchedule();
 // Generate mock energy usage data (15-minute intervals)
 export function generateMockEnergyUsage(): EnergyUsage[] {
   const data: EnergyUsage[] = [];
-  const baseDate = new Date('2025-08-01T00:00:00');
+  const baseDate = new Date('2025-06-15T00:00:00'); // Changed to June 15, 2025
   const buildings = ['14', '26', '52'];
   
   let id = 1;
