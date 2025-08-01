@@ -47,7 +47,7 @@ export default function ClassScheduleChart() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5" />
           Class Schedules
@@ -61,7 +61,7 @@ export default function ClassScheduleChart() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5" />
           Class Schedules
@@ -72,7 +72,7 @@ export default function ClassScheduleChart() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-white p-6 rounded-sm shadow-lg">
       <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
         <Calendar className="w-5 h-5" />
         Class Schedules
@@ -95,7 +95,7 @@ export default function ClassScheduleChart() {
       <div className="space-y-3">
         <h3 className="font-semibold text-gray-700">Today's Schedule</h3>
         {schedules.map((schedule) => (
-          <div key={schedule.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div key={schedule.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-sm">
             <div className="flex items-center gap-3">
               <Clock className="w-4 h-4 text-blue-500" />
               <span className="font-medium">{schedule.time}</span>

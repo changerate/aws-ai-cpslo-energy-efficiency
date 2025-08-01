@@ -53,7 +53,7 @@ export default function AHUMaintenanceSchedule() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Settings className="w-5 h-5" />
           Air-Handler Unit Optimization
@@ -67,7 +67,7 @@ export default function AHUMaintenanceSchedule() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Settings className="w-5 h-5" />
           Air-Handler Unit Optimization
@@ -169,7 +169,7 @@ export default function AHUMaintenanceSchedule() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-xl border-2 border-blue-100">
+    <div className="bg-white p-8 rounded-sm shadow-xl border-2 border-blue-100">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold flex items-center gap-3">
           <Settings className="w-6 h-6 text-blue-600" />
@@ -209,7 +209,7 @@ export default function AHUMaintenanceSchedule() {
       </div>
 
       {/* Schedule Grid - Enhanced with Collapsed Periods */}
-      <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
+      <div className="overflow-x-auto bg-gray-50 p-4 rounded-sm">
         <div className="min-w-full">
           {/* Header */}
           <div className="grid grid-cols-[200px_1fr] gap-4 mb-4">
@@ -261,7 +261,7 @@ export default function AHUMaintenanceSchedule() {
                       return (
                         <div
                           key={`${systemName}-group-${groupIndex}`}
-                          className={`rounded-lg transition-all duration-200 shadow-sm flex items-center justify-center ${
+                          className={`rounded-sm transition-all duration-200 shadow-sm flex items-center justify-center ${
                             group.shouldBeOn
                               ? 'bg-green-100 border-2 border-green-400 text-green-800'
                               : 'bg-red-100 border-2 border-red-400 text-red-800'
@@ -339,7 +339,7 @@ export default function AHUMaintenanceSchedule() {
       </div>
 
       {/* Daily Savings Summary */}
-      <div className="mt-6 bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border border-green-200">
+      <div className="mt-6 bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-sm border border-green-200">
         <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <DollarSign className="w-4 h-4 text-green-600" />
           Daily Savings Summary - Building {activeBuilding}
@@ -388,7 +388,7 @@ export default function AHUMaintenanceSchedule() {
 
       {/* Summary Stats */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-green-50 p-4 rounded-lg">
+        <div className="bg-green-50 p-4 rounded-sm">
           <div className="text-sm text-gray-600">Systems Currently ON</div>
           <div className="text-2xl font-bold text-green-600">
             {Object.values(systemGroups).reduce((count, schedules) => {
@@ -400,7 +400,7 @@ export default function AHUMaintenanceSchedule() {
             }, 0)}
           </div>
         </div>
-        <div className="bg-red-50 p-4 rounded-lg">
+        <div className="bg-red-50 p-4 rounded-sm">
           <div className="text-sm text-gray-600">Systems Available for Maintenance</div>
           <div className="text-2xl font-bold text-red-600">
             {Object.values(systemGroups).reduce((count, schedules) => {
@@ -412,7 +412,7 @@ export default function AHUMaintenanceSchedule() {
             }, 0)}
           </div>
         </div>
-        <div className="bg-blue-50 p-4 rounded-lg">
+        <div className="bg-blue-50 p-4 rounded-sm">
           <div className="text-sm text-gray-600">Total AHU Systems</div>
           <div className="text-2xl font-bold text-blue-600">
             {Object.keys(systemGroups).length}

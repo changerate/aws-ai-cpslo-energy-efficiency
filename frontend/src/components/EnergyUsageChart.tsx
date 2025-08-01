@@ -199,7 +199,7 @@ export default function EnergyUsageChart() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Zap className="w-5 h-5" />
           Energy Usage Analysis
@@ -213,7 +213,7 @@ export default function EnergyUsageChart() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Zap className="w-5 h-5" />
           Energy Usage Analysis
@@ -224,7 +224,7 @@ export default function EnergyUsageChart() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-white p-6 rounded-sm shadow-lg">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <Zap className="w-5 h-5" />
@@ -268,7 +268,7 @@ export default function EnergyUsageChart() {
           <button
             key={option.value}
             onClick={() => setSelectedTimeFrame(option.value)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-sm text-sm font-medium transition-colors ${
               selectedTimeFrame === option.value
                 ? 'bg-blue-100 text-blue-700 border border-blue-300'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300'
@@ -285,28 +285,28 @@ export default function EnergyUsageChart() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg">
+        <div className="bg-blue-50 p-4 rounded-sm">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-blue-500" />
             <span className="text-sm text-gray-600">Total Usage</span>
           </div>
           <div className="text-2xl font-bold text-blue-600">{totalEnergy.toFixed(1)} kWh</div>
         </div>
-        <div className="bg-green-50 p-4 rounded-lg">
+        <div className="bg-green-50 p-4 rounded-sm">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-green-500" />
             <span className="text-sm text-gray-600">Average</span>
           </div>
           <div className="text-2xl font-bold text-green-600">{avgEnergy.toFixed(1)} kWh</div>
         </div>
-        <div className="bg-red-50 p-4 rounded-lg">
+        <div className="bg-red-50 p-4 rounded-sm">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-red-500" />
             <span className="text-sm text-gray-600">Peak Usage</span>
           </div>
           <div className="text-2xl font-bold text-red-600">{maxEnergy.toFixed(1)} kWh</div>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg">
+        <div className="bg-purple-50 p-4 rounded-sm">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-purple-500" />
             <span className="text-sm text-gray-600">Min Usage</span>
@@ -377,7 +377,7 @@ export default function EnergyUsageChart() {
       </div>
 
       {/* Current Status */}
-      <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="bg-gray-50 p-4 rounded-sm">
         <h3 className="font-semibold text-gray-700 mb-2">
           Building {activeBuilding} - {timeFrameOptions.find(opt => opt.value === selectedTimeFrame)?.label}
         </h3>
