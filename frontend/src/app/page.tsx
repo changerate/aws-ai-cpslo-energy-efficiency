@@ -29,7 +29,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Welcome Section */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-sm shadow-lg">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-sm shadow-sm">
             <h2 className="text-3xl font-bold mb-2">Welcome to the Energy Dashboard</h2>
             <p className="text-blue-100">
               Monitor Air-Handler Unit Optimizations, track energy usage and savings, with real-time data from your CSV files.
@@ -60,7 +60,7 @@ export default function Dashboard() {
           </div>
 
           {/* Footer Info */}
-          <div className="bg-white p-6 rounded-sm shadow-lg">
+          <div className="bg-white p-6 rounded-sm shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
               <div>
                 <h3 className="font-semibold text-gray-700 mb-2">Air-Handler Unit</h3>

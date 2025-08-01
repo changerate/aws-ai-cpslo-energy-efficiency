@@ -47,7 +47,7 @@ export default function ClassScheduleChart() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5" />
           Class Schedules
@@ -61,7 +61,7 @@ export default function ClassScheduleChart() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5" />
           Class Schedules
@@ -72,7 +72,7 @@ export default function ClassScheduleChart() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-sm shadow-lg">
+    <div className="bg-white p-6 rounded-sm shadow-sm">
       <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
         <Calendar className="w-5 h-5" />
         Class Schedules

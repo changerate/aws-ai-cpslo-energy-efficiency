@@ -53,7 +53,7 @@ export default function AHUMaintenanceSchedule() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Settings className="w-5 h-5" />
           Air-Handler Unit Optimization
@@ -67,7 +67,7 @@ export default function AHUMaintenanceSchedule() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Settings className="w-5 h-5" />
           Air-Handler Unit Optimization
@@ -169,7 +169,7 @@ export default function AHUMaintenanceSchedule() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-sm shadow-xl border-2 border-blue-100">
+    <div className="bg-white p-8 rounded-sm shadow-sm border-2 border-blue-100">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold flex items-center gap-3">
           <Settings className="w-6 h-6 text-blue-600" />

@@ -243,7 +243,7 @@ export default function EnergySavingsChart() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <TrendingDown className="w-5 h-5" />
           Energy Savings Analysis
@@ -257,7 +257,7 @@ export default function EnergySavingsChart() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <TrendingDown className="w-5 h-5" />
           Energy Savings Analysis
@@ -269,7 +269,7 @@ export default function EnergySavingsChart() {
 
   if (!savingsData) {
     return (
-      <div className="bg-white p-6 rounded-sm shadow-lg">
+      <div className="bg-white p-6 rounded-sm shadow-sm">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <TrendingDown className="w-5 h-5" />
           Energy Savings Analysis
@@ -280,7 +280,7 @@ export default function EnergySavingsChart() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-sm shadow-lg">
+    <div className="bg-white p-6 rounded-sm shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <TrendingDown className="w-5 h-5" />

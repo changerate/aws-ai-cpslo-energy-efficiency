@@ -34,7 +34,7 @@ export default function RateDataChart() {
 
   if (loading) {
     return (
-      <div className="bg-white p-4 rounded-sm shadow-lg">
+      <div className="bg-white p-4 rounded-sm shadow-sm">
         <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
           <DollarSign className="w-4 h-4" />
           Electricity Rates
@@ -48,7 +48,7 @@ export default function RateDataChart() {
 
   if (error) {
     return (
-      <div className="bg-white p-4 rounded-sm shadow-lg">
+      <div className="bg-white p-4 rounded-sm shadow-sm">
         <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
           <DollarSign className="w-4 h-4" />
           Electricity Rates
@@ -64,7 +64,7 @@ export default function RateDataChart() {
   const minRate = Math.min(...rateData.map(rate => rate.pricePerKwh));
 
   return (
-    <div className="bg-white p-4 rounded-sm shadow-lg">
+    <div className="bg-white p-4 rounded-sm shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-bold flex items-center gap-2">
           <DollarSign className="w-4 h-4" />
