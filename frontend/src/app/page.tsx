@@ -1,5 +1,6 @@
 import AHUMaintenanceSchedule from '@/components/AHUMaintenanceSchedule';
 import EnergyUsageChart from '@/components/EnergyUsageChart';
+import EnergyCostChart from '@/components/EnergyCostChart';
 import EnergySavingsChart from '@/components/EnergySavingsChart';
 import RateDataChart from '@/components/RateDataChart';
 import { Activity, BarChart3 } from 'lucide-react';
@@ -41,11 +42,16 @@ export default function Dashboard() {
             <AHUMaintenanceSchedule />
           </div>
 
-          {/* Energy Analysis Grid - Two Main Modules */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Energy Analysis Grid - Three Main Modules */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {/* Energy Usage Chart */}
             <div className="lg:col-span-1">
               <EnergyUsageChart />
+            </div>
+
+            {/* Energy Cost Chart */}
+            <div className="lg:col-span-1">
+              <EnergyCostChart />
             </div>
 
             {/* Energy Savings Chart */}
