@@ -11,6 +11,7 @@ import { notFound } from './middleware/notFound';
 
 // Import routes
 import apiRoutes from './routes/api';
+import ahuOptimizationRoutes from './routes/ahu-optimization';
 
 // Load environment variables
 dotenv.config();
@@ -49,6 +50,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api', apiRoutes);
+app.use('/api/ahu-optimization', ahuOptimizationRoutes);
 
 // Error handling middleware
 app.use(notFound);
