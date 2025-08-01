@@ -144,33 +144,80 @@ export default function EnergySavingsChart() {
         });
       });
     } else if (timeframe === 'week') {
-      // Generate daily data for week view
+      // Generate daily data for week view using real CSV data
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const baseUsage = activeBuilding === '14' ? 35 : activeBuilding === '26' ? 28 : 42;
+      
+      // Get the reference date from the data
+      const referenceDate = currentYearData.length > 0 ? new Date(currentYearData[0].dateTime) : new Date('2025-06-15');
+      const startOfWeek = new Date(referenceDate);
+      startOfWeek.setUTCDate(referenceDate.getUTCDate() - referenceDate.getUTCDay()); // Start of week (Sunday)
       
       days.forEach((day, index) => {
-        const currentUsage = baseUsage * 24 + (Math.random() - 0.5) * 100;
-        const previousUsage = currentUsage * 1.15 + (Math.random() - 0.5) * 50; // 15% higher last year
+        const currentDay = new Date(startOfWeek);
+        currentDay.setUTCDate(startOfWeek.getUTCDate() + index);
+        
+        const previousYearDay = new Date(currentDay);
+        previousYearDay.setUTCFullYear(currentDay.getUTCFullYear() - 1);
+        
+        // Filter data for this specific day
+        const currentDayData = currentYearData.filter(d => {
+          const dataDate = new Date(d.dateTime);
+          return dataDate.toDateString() === currentDay.toDateString();
+        });
+        
+        const previousDayData = previousYearData.filter(d => {
+          const dataDate = new Date(d.dateTime);
+          return dataDate.toDateString() === previousYearDay.toDateString();
+        });
+        
+        // Calculate daily totals
+        const currentDayTotal = currentDayData.reduce((sum, d) => sum + d.energyUsedKwh, 0);
+        const previousDayTotal = previousDayData.reduce((sum, d) => sum + d.energyUsedKwh, 0);
         
         chartPoints.push({
           time: day,
-          currentUsage: Math.round(currentUsage * 100) / 100,
-          previousYearUsage: Math.round(previousUsage * 100) / 100,
-          timestamp: new Date(2025, 5, 15 + index).toISOString()
+          currentUsage: Math.round(currentDayTotal * 100) / 100,
+          previousYearUsage: Math.round(previousDayTotal * 100) / 100,
+          timestamp: currentDay.toISOString()
         });
       });
     } else {
-      // Generate weekly data for month view
-      for (let week = 1; week <= 4; week++) {
-        const baseUsage = (activeBuilding === '14' ? 35 : activeBuilding === '26' ? 28 : 42) * 24 * 7;
-        const currentUsage = baseUsage + (Math.random() - 0.5) * 500;
-        const previousUsage = currentUsage * 1.12 + (Math.random() - 0.5) * 200; // 12% higher last year
+      // Generate weekly data for month view using real CSV data
+      const referenceDate = currentYearData.length > 0 ? new Date(currentYearData[0].dateTime) : new Date('2025-06-15');
+      const startOfMonth = new Date(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), 1);
+      const weeksInMonth = Math.ceil((new Date(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth() + 1, 0).getUTCDate() + startOfMonth.getUTCDay()) / 7);
+      
+      for (let week = 0; week < weeksInMonth; week++) {
+        const weekStart = new Date(startOfMonth);
+        weekStart.setUTCDate(1 + (week * 7) - startOfMonth.getUTCDay());
+        const weekEnd = new Date(weekStart);
+        weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+        
+        const previousYearWeekStart = new Date(weekStart);
+        previousYearWeekStart.setUTCFullYear(weekStart.getUTCFullYear() - 1);
+        const previousYearWeekEnd = new Date(weekEnd);
+        previousYearWeekEnd.setUTCFullYear(weekEnd.getUTCFullYear() - 1);
+        
+        // Filter data for this week
+        const currentWeekData = currentYearData.filter(d => {
+          const dataDate = new Date(d.dateTime);
+          return dataDate >= weekStart && dataDate <= weekEnd;
+        });
+        
+        const previousWeekData = previousYearData.filter(d => {
+          const dataDate = new Date(d.dateTime);
+          return dataDate >= previousYearWeekStart && dataDate <= previousYearWeekEnd;
+        });
+        
+        // Calculate weekly totals
+        const currentWeekTotal = currentWeekData.reduce((sum, d) => sum + d.energyUsedKwh, 0);
+        const previousWeekTotal = previousWeekData.reduce((sum, d) => sum + d.energyUsedKwh, 0);
         
         chartPoints.push({
-          time: `Week ${week}`,
-          currentUsage: Math.round(currentUsage * 100) / 100,
-          previousYearUsage: Math.round(previousUsage * 100) / 100,
-          timestamp: new Date(2025, 5, week * 7).toISOString()
+          time: `Week ${week + 1}`,
+          currentUsage: Math.round(currentWeekTotal * 100) / 100,
+          previousYearUsage: Math.round(previousWeekTotal * 100) / 100,
+          timestamp: weekStart.toISOString()
         });
       }
     }
@@ -234,10 +281,16 @@ export default function EnergySavingsChart() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-        <TrendingDown className="w-5 h-5" />
-        Energy Savings Analysis
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <TrendingDown className="w-5 h-5" />
+          Energy Savings Analysis
+        </h2>
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <span>Real CSV Data</span>
+        </div>
+      </div>
       
       {/* Building Tabs */}
       <div className="flex border-b border-gray-200 mb-4">
@@ -342,10 +395,16 @@ export default function EnergySavingsChart() {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="time" 
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 10 }}
               angle={selectedTimeFrame === 'day' ? -45 : 0}
               textAnchor={selectedTimeFrame === 'day' ? 'end' : 'middle'}
               height={selectedTimeFrame === 'day' ? 60 : 30}
+              interval={selectedTimeFrame === 'day' ? 'preserveStartEnd' : 0}
+              tickFormatter={(value, index) => {
+                // For daily view, show every 4th tick (every hour) for better readability
+                if (selectedTimeFrame === 'day' && index % 4 !== 0) return '';
+                return value;
+              }}
             />
             <YAxis 
               label={{ value: 'kWh', angle: -90, position: 'insideLeft' }}
@@ -377,7 +436,7 @@ export default function EnergySavingsChart() {
               dataKey="currentUsage" 
               stroke="#10b981" 
               strokeWidth={3}
-              dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+              dot={{ fill: '#10b981', strokeWidth: 2, r: 2 }}
               activeDot={{ r: 6, stroke: '#10b981', strokeWidth: 2 }}
               name="Current Usage"
             />

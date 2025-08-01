@@ -1,4 +1,4 @@
-import { ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '../types';
+import { ClassSchedule, EnergyUsage, RateData, AHUSystem, AHUSchedule } from '../types';
 
 // Mock Class Schedule Data
 export const mockClassSchedules: ClassSchedule[] = [
@@ -68,33 +68,33 @@ export const mockClassSchedules: ClassSchedule[] = [
   }
 ];
 
-// Mock HVAC Systems Data
-export const mockHVACSystems: HVACSystem[] = [
-  // Building 14 HVAC Systems
-  { id: 1, systemName: 'HVAC-1', buildingNumber: '14', zones: ['201-210', '211-220'] },
-  { id: 2, systemName: 'HVAC-2', buildingNumber: '14', zones: ['150-160', '161-170'] },
-  { id: 3, systemName: 'HVAC-3', buildingNumber: '14', zones: ['200-210', '211-220'] },
-  { id: 4, systemName: 'HVAC-4', buildingNumber: '14', zones: ['171-180', '181-190'] },
-  { id: 5, systemName: 'HVAC-5', buildingNumber: '14', zones: ['191-210', '211-230'] },
+// Mock AHU Systems Data
+export const mockAHUSystems: AHUSystem[] = [
+  // Building 14 AHU Systems
+  { id: 1, systemName: 'AHU-1', buildingNumber: '14', zones: ['201-210', '211-220'] },
+  { id: 2, systemName: 'AHU-2', buildingNumber: '14', zones: ['150-160', '161-170'] },
+  { id: 3, systemName: 'AHU-3', buildingNumber: '14', zones: ['200-210', '211-220'] },
+  { id: 4, systemName: 'AHU-4', buildingNumber: '14', zones: ['171-180', '181-190'] },
+  { id: 5, systemName: 'AHU-5', buildingNumber: '14', zones: ['191-210', '211-230'] },
   
-  // Building 26 HVAC Systems
-  { id: 6, systemName: 'HVAC-1', buildingNumber: '26', zones: ['100-115', '116-130'] },
-  { id: 7, systemName: 'HVAC-2', buildingNumber: '26', zones: ['105-120', '121-135'] },
-  { id: 8, systemName: 'HVAC-3', buildingNumber: '26', zones: ['210-225', '226-240'] },
-  { id: 9, systemName: 'HVAC-4', buildingNumber: '26', zones: ['241-255', '256-270'] },
-  { id: 10, systemName: 'HVAC-5', buildingNumber: '26', zones: ['271-285', '286-300'] },
+  // Building 26 AHU Systems
+  { id: 6, systemName: 'AHU-1', buildingNumber: '26', zones: ['100-115', '116-130'] },
+  { id: 7, systemName: 'AHU-2', buildingNumber: '26', zones: ['105-120', '121-135'] },
+  { id: 8, systemName: 'AHU-3', buildingNumber: '26', zones: ['210-225', '226-240'] },
+  { id: 9, systemName: 'AHU-4', buildingNumber: '26', zones: ['241-255', '256-270'] },
+  { id: 10, systemName: 'AHU-5', buildingNumber: '26', zones: ['271-285', '286-300'] },
   
-  // Building 52 HVAC Systems
-  { id: 11, systemName: 'HVAC-1', buildingNumber: '52', zones: ['100-115', '116-130'] },
-  { id: 12, systemName: 'HVAC-2', buildingNumber: '52', zones: ['300-315', '316-330'] },
-  { id: 13, systemName: 'HVAC-3', buildingNumber: '52', zones: ['331-345', '346-360'] },
-  { id: 14, systemName: 'HVAC-4', buildingNumber: '52', zones: ['361-375', '376-390'] },
-  { id: 15, systemName: 'HVAC-5', buildingNumber: '52', zones: ['391-405', '406-420'] }
+  // Building 52 AHU Systems
+  { id: 11, systemName: 'AHU-1', buildingNumber: '52', zones: ['100-115', '116-130'] },
+  { id: 12, systemName: 'AHU-2', buildingNumber: '52', zones: ['300-315', '316-330'] },
+  { id: 13, systemName: 'AHU-3', buildingNumber: '52', zones: ['331-345', '346-360'] },
+  { id: 14, systemName: 'AHU-4', buildingNumber: '52', zones: ['361-375', '376-390'] },
+  { id: 15, systemName: 'AHU-5', buildingNumber: '52', zones: ['391-405', '406-420'] }
 ];
 
-// Generate HVAC Schedule based on class schedules
-export const generateHVACSchedule = (): HVACSchedule[] => {
-  const schedules: HVACSchedule[] = [];
+// Generate AHU Schedule based on class schedules
+export const generateAHUSchedule = (): AHUSchedule[] => {
+  const schedules: AHUSchedule[] = [];
   const buildings = ['14', '26', '52'];
   
   // Generate time slots from 7:00 AM to 10:00 PM in 30-minute increments
@@ -113,12 +113,12 @@ export const generateHVACSchedule = (): HVACSchedule[] => {
   const timeSlots = generateTimeSlots();
   
   buildings.forEach(buildingNumber => {
-    const buildingHVACs = mockHVACSystems.filter(hvac => hvac.buildingNumber === buildingNumber);
+    const buildingAHUs = mockAHUSystems.filter(ahu => ahu.buildingNumber === buildingNumber);
     const buildingClasses = mockClassSchedules.filter(cls => cls.buildingNumber === buildingNumber);
     
-    buildingHVACs.forEach(hvac => {
+    buildingAHUs.forEach(ahu => {
       timeSlots.forEach(timeSlot => {
-        // Check if there's a class during this time slot that affects this HVAC system
+        // Check if there's a class during this time slot that affects this AHU system
         const hasActiveClass = buildingClasses.some(cls => {
           const classTime = cls.time;
           const classTimeParts = classTime.split(':');
@@ -133,9 +133,9 @@ export const generateHVACSchedule = (): HVACSchedule[] => {
           const classEndMinutes = classStartMinutes + 90; // 1.5 hours
           const slotMinutes = slotHour * 60 + slotMinute;
           
-          // Check if the room is in the HVAC zone and if the time overlaps
+          // Check if the room is in the AHU zone and if the time overlaps
           const roomNumber = cls.roomNumber;
-          const isInZone = hvac.zones.some(zone => {
+          const isInZone = ahu.zones.some(zone => {
             const zoneParts = zone.split('-');
             const start = parseInt(zoneParts[0] || '0');
             const end = parseInt(zoneParts[1] || '0');
@@ -148,9 +148,9 @@ export const generateHVACSchedule = (): HVACSchedule[] => {
         
         schedules.push({
           id: schedules.length + 1,
-          hvacSystemId: hvac.id,
+          ahuSystemId: ahu.id,
           buildingNumber,
-          systemName: hvac.systemName,
+          systemName: ahu.systemName,
           timeSlot,
           shouldBeOn: hasActiveClass,
           hasActiveClass,
@@ -165,7 +165,7 @@ export const generateHVACSchedule = (): HVACSchedule[] => {
 
 // Generate fresh energy data each time
 export const mockEnergyUsage = generateMockEnergyUsage();
-export const mockHVACSchedules = generateHVACSchedule();
+export const mockAHUSchedules = generateAHUSchedule();
 
 // Generate mock energy usage data (15-minute intervals)
 export function generateMockEnergyUsage(): EnergyUsage[] {

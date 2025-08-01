@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { Settings, Power, PowerOff, Clock } from 'lucide-react';
-import { HVACSchedule } from '@/types';
-import { fetchHVACSchedule } from '@/services/api';
+import { AHUSchedule } from '@/types';
+import { fetchAHUSchedule } from '@/services/api';
 
-export default function HVACMaintenanceSchedule() {
-  const [scheduleData, setScheduleData] = useState<HVACSchedule[]>([]);
+export default function AHUMaintenanceSchedule() {
+  const [scheduleData, setScheduleData] = useState<AHUSchedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeBuilding, setActiveBuilding] = useState('14');
@@ -17,14 +17,14 @@ export default function HVACMaintenanceSchedule() {
     async function loadData() {
       try {
         setLoading(true);
-        const response = await fetchHVACSchedule();
+        const response = await fetchAHUSchedule();
         if (response.success) {
           setScheduleData(response.data);
         } else {
-          setError('Failed to load HVAC schedule');
+          setError('Failed to load AHU schedule');
         }
       } catch (err) {
-        setError('Error loading HVAC schedule');
+        setError('Error loading AHU schedule');
         console.error(err);
       } finally {
         setLoading(false);
@@ -39,14 +39,14 @@ export default function HVACMaintenanceSchedule() {
     schedule => schedule.buildingNumber === activeBuilding
   );
 
-  // Group by HVAC system
+  // Group by AHU system
   const systemGroups = buildingSchedule.reduce((acc, schedule) => {
     if (!acc[schedule.systemName]) {
       acc[schedule.systemName] = [];
     }
     acc[schedule.systemName].push(schedule);
     return acc;
-  }, {} as Record<string, HVACSchedule[]>);
+  }, {} as Record<string, AHUSchedule[]>);
 
   // Get unique time slots and sort them
   const timeSlots = [...new Set(buildingSchedule.map(s => s.timeSlot))].sort();
@@ -56,7 +56,7 @@ export default function HVACMaintenanceSchedule() {
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Settings className="w-5 h-5" />
-          HVAC Maintenance Schedule
+          Air-Handler Unit Uptime
         </h2>
         <div className="animate-pulse">
           <div className="h-64 bg-gray-200 rounded"></div>
@@ -70,7 +70,7 @@ export default function HVACMaintenanceSchedule() {
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Settings className="w-5 h-5" />
-          HVAC Maintenance Schedule
+          Air-Handler Unit Uptime
         </h2>
         <div className="text-red-500">Error: {error}</div>
       </div>
@@ -82,7 +82,7 @@ export default function HVACMaintenanceSchedule() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold flex items-center gap-3">
           <Settings className="w-6 h-6 text-blue-600" />
-          HVAC Maintenance Schedule
+          Air-Handler Unit Uptime
         </h2>
         <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
           <Clock className="w-4 h-4" />
@@ -124,7 +124,7 @@ export default function HVACMaintenanceSchedule() {
           <div className="grid grid-cols-[140px_repeat(auto-fit,minmax(70px,1fr))] gap-2 mb-3">
             <div className="font-bold text-gray-800 p-3 bg-white rounded shadow-sm">
               <Clock className="w-4 h-4 inline mr-2" />
-              HVAC System
+              AHU System
             </div>
             {timeSlots.slice(0, 12).map((timeSlot) => (
               <div key={timeSlot} className="text-sm font-semibold text-gray-700 p-2 text-center bg-white rounded shadow-sm">
@@ -133,7 +133,7 @@ export default function HVACMaintenanceSchedule() {
             ))}
           </div>
 
-          {/* HVAC Systems Rows */}
+          {/* AHU Systems Rows */}
           {Object.entries(systemGroups).map(([systemName, schedules]) => (
             <div key={systemName} className="grid grid-cols-[140px_repeat(auto-fit,minmax(70px,1fr))] gap-2 mb-2">
               {/* System Name */}
@@ -180,13 +180,13 @@ export default function HVACMaintenanceSchedule() {
           <div className="w-4 h-4 bg-green-100 border border-green-300 rounded flex items-center justify-center">
             <Power className="w-3 h-3 text-green-600" />
           </div>
-          <span className="text-gray-600">HVAC ON (Class Active)</span>
+          <span className="text-gray-600">AHU ON (Class Active)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-100 border border-red-300 rounded flex items-center justify-center">
             <PowerOff className="w-3 h-3 text-red-600" />
           </div>
-          <span className="text-gray-600">HVAC OFF (Safe to Maintain)</span>
+          <span className="text-gray-600">AHU OFF (Safe to Maintain)</span>
         </div>
       </div>
 
@@ -217,7 +217,7 @@ export default function HVACMaintenanceSchedule() {
           </div>
         </div>
         <div className="bg-blue-50 p-4 rounded-lg">
-          <div className="text-sm text-gray-600">Total HVAC Systems</div>
+          <div className="text-sm text-gray-600">Total AHU Systems</div>
           <div className="text-2xl font-bold text-blue-600">
             {Object.keys(systemGroups).length}
           </div>

@@ -1,4 +1,4 @@
-import { ApiResponse, ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '@/types';
+import { ApiResponse, ClassSchedule, EnergyUsage, RateData, AHUSystem, AHUSchedule } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3100/api';
 
@@ -24,20 +24,20 @@ export async function fetchClassSchedules(): Promise<ApiResponse<ClassSchedule[]
   return fetchApi<ClassSchedule[]>('/data/class-schedules');
 }
 
-// Fetch HVAC systems
-export async function fetchHVACSystems(building?: string): Promise<ApiResponse<HVACSystem[]>> {
-  const endpoint = building ? `/data/hvac-systems?building=${building}` : '/data/hvac-systems';
-  return fetchApi<HVACSystem[]>(endpoint);
+// Fetch AHU systems
+export async function fetchAHUSystems(building?: string): Promise<ApiResponse<AHUSystem[]>> {
+  const endpoint = building ? `/data/ahu-systems?building=${building}` : '/data/ahu-systems';
+  return fetchApi<AHUSystem[]>(endpoint);
 }
 
-// Fetch HVAC schedule
-export async function fetchHVACSchedule(building?: string, system?: string): Promise<ApiResponse<HVACSchedule[]>> {
+// Fetch AHU schedule
+export async function fetchAHUSchedule(building?: string, system?: string): Promise<ApiResponse<AHUSchedule[]>> {
   const params = new URLSearchParams();
   if (building) params.append('building', building);
   if (system) params.append('system', system);
   
-  const endpoint = `/data/hvac-schedule${params.toString() ? `?${params.toString()}` : ''}`;
-  return fetchApi<HVACSchedule[]>(endpoint);
+  const endpoint = `/data/ahu-schedule${params.toString() ? `?${params.toString()}` : ''}`;
+  return fetchApi<AHUSchedule[]>(endpoint);
 }
 
 // Fetch energy usage data

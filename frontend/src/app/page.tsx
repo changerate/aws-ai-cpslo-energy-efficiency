@@ -1,4 +1,4 @@
-import HVACMaintenanceSchedule from '@/components/HVACMaintenanceSchedule';
+import AHUMaintenanceSchedule from '@/components/AHUMaintenanceSchedule';
 import EnergyUsageChart from '@/components/EnergyUsageChart';
 import EnergySavingsChart from '@/components/EnergySavingsChart';
 import RateDataChart from '@/components/RateDataChart';
@@ -32,13 +32,13 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-lg shadow-lg">
             <h2 className="text-3xl font-bold mb-2">Welcome to the Energy Dashboard</h2>
             <p className="text-blue-100">
-              Monitor HVAC maintenance schedules, track energy usage and savings, with real-time data from your CSV files.
+              Monitor Air-Handler Unit Uptimes, track energy usage and savings, with real-time data from your CSV files.
             </p>
           </div>
 
-          {/* HVAC Maintenance Schedule - Full Width at Top */}
+          {/* Air-Handler Unit Uptime - Full Width at Top */}
           <div className="w-full">
-            <HVACMaintenanceSchedule />
+            <AHUMaintenanceSchedule />
           </div>
 
           {/* Energy Analysis Grid - Two Main Modules */}
@@ -63,9 +63,9 @@ export default function Dashboard() {
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
               <div>
-                <h3 className="font-semibold text-gray-700 mb-2">HVAC Maintenance</h3>
+                <h3 className="font-semibold text-gray-700 mb-2">Air-Handler Unit</h3>
                 <p className="text-sm text-gray-500">
-                  Primary focus: Track HVAC system schedules across campus buildings to optimize maintenance timing and prevent downtime.
+                  Primary focus: Track AHU system schedules across campus buildings to optimize maintenance timing and prevent downtime.
                 </p>
               </div>
               <div>

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { mockClassSchedules, mockRateData, mockHVACSystems, mockHVACSchedules } from '../data/mockData';
-import { ApiResponse, ClassSchedule, EnergyUsage, RateData, HVACSystem, HVACSchedule } from '../types';
+import { mockClassSchedules, mockRateData, mockAHUSystems, mockAHUSchedules } from '../data/mockData';
+import { ApiResponse, ClassSchedule, EnergyUsage, RateData, AHUSystem, AHUSchedule } from '../types';
 import { CSVService } from '../services/csvService';
 
 const router = express.Router();
@@ -27,22 +27,22 @@ router.get('/class-schedules', (req: Request, res: Response) => {
   }
 });
 
-// GET /api/data/hvac-systems - Get all HVAC systems
-router.get('/hvac-systems', (req: Request, res: Response) => {
+// GET /api/data/ahu-systems - Get all AHU systems
+router.get('/ahu-systems', (req: Request, res: Response) => {
   try {
     const { building } = req.query;
     
-    let filteredData = mockHVACSystems;
+    let filteredData = mockAHUSystems;
     
     // Filter by building if specified
     if (building && typeof building === 'string') {
-      filteredData = mockHVACSystems.filter(hvac => hvac.buildingNumber === building);
+      filteredData = mockAHUSystems.filter(ahu => ahu.buildingNumber === building);
     }
     
-    const response: ApiResponse<HVACSystem[]> = {
+    const response: ApiResponse<AHUSystem[]> = {
       success: true,
       data: filteredData,
-      message: `HVAC systems retrieved successfully${building ? ` for building ${building}` : ''}`,
+      message: `AHU systems retrieved successfully${building ? ` for building ${building}` : ''}`,
       timestamp: new Date().toISOString()
     };
     
@@ -51,18 +51,18 @@ router.get('/hvac-systems', (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       data: [],
-      message: `Error retrieving HVAC systems: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Error retrieving AHU systems: ${error instanceof Error ? error.message : 'Unknown error'}`,
       timestamp: new Date().toISOString()
     });
   }
 });
 
-// GET /api/data/hvac-schedule - Get HVAC maintenance schedule
-router.get('/hvac-schedule', (req: Request, res: Response) => {
+// GET /api/data/ahu-schedule - Get Air-Handler Unit Uptime
+router.get('/ahu-schedule', (req: Request, res: Response) => {
   try {
     const { building, system } = req.query;
     
-    let filteredData = mockHVACSchedules;
+    let filteredData = mockAHUSchedules;
     
     // Filter by building if specified
     if (building && typeof building === 'string') {
@@ -74,10 +74,10 @@ router.get('/hvac-schedule', (req: Request, res: Response) => {
       filteredData = filteredData.filter(schedule => schedule.systemName === system);
     }
     
-    const response: ApiResponse<HVACSchedule[]> = {
+    const response: ApiResponse<AHUSchedule[]> = {
       success: true,
       data: filteredData,
-      message: `HVAC schedule retrieved successfully${building ? ` for building ${building}` : ''}${system ? ` system ${system}` : ''}`,
+      message: `AHU schedule retrieved successfully${building ? ` for building ${building}` : ''}${system ? ` system ${system}` : ''}`,
       timestamp: new Date().toISOString()
     };
     
@@ -86,7 +86,7 @@ router.get('/hvac-schedule', (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       data: [],
-      message: `Error retrieving HVAC schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Error retrieving AHU schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
       timestamp: new Date().toISOString()
     });
   }
@@ -274,11 +274,11 @@ router.get('/summary', async (req: Request, res: Response) => {
         buildings: [...new Set(mockClassSchedules.map(cs => cs.buildingNumber))],
         dates: [...new Set(mockClassSchedules.map(cs => cs.date))]
       },
-      hvacSystems: {
-        count: mockHVACSystems.length,
-        buildings: [...new Set(mockHVACSystems.map(hvac => hvac.buildingNumber))],
-        systemsPerBuilding: mockHVACSystems.reduce((acc, hvac) => {
-          acc[hvac.buildingNumber] = (acc[hvac.buildingNumber] || 0) + 1;
+      ahuSystems: {
+        count: mockAHUSystems.length,
+        buildings: [...new Set(mockAHUSystems.map(ahu => ahu.buildingNumber))],
+        systemsPerBuilding: mockAHUSystems.reduce((acc, ahu) => {
+          acc[ahu.buildingNumber] = (acc[ahu.buildingNumber] || 0) + 1;
           return acc;
         }, {} as Record<string, number>)
       },
