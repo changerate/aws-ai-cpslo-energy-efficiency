@@ -212,25 +212,31 @@ export default function AHUMaintenanceSchedule() {
       <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
         <div className="min-w-full">
           {/* Header */}
-          <div className="grid grid-cols-[200px_1fr] gap-4 mb-4 items-end">
+          <div className="grid grid-cols-[200px_1fr] gap-4 mb-4">
             {/* System Label Header */}
-            <div className="font-bold text-gray-800 p-4 bg-white rounded shadow-sm h-20 flex items-center border-2 border-blue-200">
+            <div className="font-bold text-gray-800 p-4 bg-white rounded shadow-sm flex items-center border-2 border-blue-200">
               <Clock className="w-4 h-4 inline mr-2" />
               AHU System
             </div>
             
-            {/* Time Slots Header */}
-            <div className="h-20 flex flex-col justify-end">
-              <div className="font-semibold text-gray-700 p-2 bg-white rounded shadow-sm mb-2 text-center border border-gray-300">
-                Schedule Timeline - Consecutive Periods Grouped
-              </div>
-              <div className="grid grid-cols-12 gap-1 text-xs text-gray-600">
-                {timeSlots.slice(0, 12).map((timeSlot, index) => (
-                  <div key={timeSlot} className="text-center p-1 bg-gray-100 rounded border h-6 flex items-center justify-center">
-                    {timeSlot}
-                  </div>
-                ))}
-              </div>
+            {/* Schedule Timeline Header */}
+            <div className="font-bold text-gray-800 p-4 bg-white rounded shadow-sm text-center border border-gray-300">
+              Schedule Timeline - Consecutive Periods Grouped
+            </div>
+          </div>
+
+          {/* Time Labels Row */}
+          <div className="grid grid-cols-[200px_1fr] gap-4 mb-4">
+            {/* Empty space to align with AHU labels */}
+            <div></div>
+            
+            {/* Time markers - simple floating labels */}
+            <div className="grid grid-cols-12 gap-1 text-xs text-gray-500">
+              {timeSlots.slice(0, 12).map((timeSlot, index) => (
+                <div key={timeSlot} className="text-center font-medium">
+                  {timeSlot}
+                </div>
+              ))}
             </div>
           </div>
 

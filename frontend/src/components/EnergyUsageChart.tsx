@@ -132,7 +132,7 @@ export default function EnergyUsageChart() {
         
       case 'week':
         // Generate daily data for the week containing our data date
-        const weekData = [];
+        const weekData: Array<{ time: string; energy: number; timestamp: string }> = [];
         const startOfWeek = new Date(dataDate);
         startOfWeek.setDate(dataDate.getDate() - dataDate.getDay()); // Start of week (Sunday)
         
