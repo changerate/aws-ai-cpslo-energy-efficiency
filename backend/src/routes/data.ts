@@ -57,7 +57,7 @@ router.get('/ahu-systems', (req: Request, res: Response) => {
   }
 });
 
-// GET /api/data/ahu-schedule - Get Air-Handler Unit Uptime
+// GET /api/data/ahu-schedule - Get Air-Handler Unit Optimization
 router.get('/ahu-schedule', (req: Request, res: Response) => {
   try {
     const { building, system } = req.query;

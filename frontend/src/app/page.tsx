@@ -32,11 +32,11 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-lg shadow-lg">
             <h2 className="text-3xl font-bold mb-2">Welcome to the Energy Dashboard</h2>
             <p className="text-blue-100">
-              Monitor Air-Handler Unit Uptimes, track energy usage and savings, with real-time data from your CSV files.
+              Monitor Air-Handler Unit Optimizations, track energy usage and savings, with real-time data from your CSV files.
             </p>
           </div>
 
-          {/* Air-Handler Unit Uptime - Full Width at Top */}
+          {/* Air-Handler Unit Optimization - Full Width at Top */}
           <div className="w-full">
             <AHUMaintenanceSchedule />
           </div>
