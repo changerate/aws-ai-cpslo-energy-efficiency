@@ -1,1 +1,1 @@
-# aws-ai-cpslo-energy-efficiency
+# AWS & Cal Poly SLO, CSU Energy Savings 
