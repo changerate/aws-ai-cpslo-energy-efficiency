@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Settings, Power, PowerOff, Clock } from 'lucide-react';
+import { Settings, Power, PowerOff, Clock, DollarSign } from 'lucide-react';
 import { AHUSchedule } from '@/types';
 import { fetchAHUSchedule } from '@/services/api';
 
@@ -76,6 +76,31 @@ export default function AHUMaintenanceSchedule() {
       </div>
     );
   }
+
+  // Calculate estimated savings for OFF periods
+  const calculateSavings = (span: number, systemName: string) => {
+    // Estimate kWh consumption per period for different AHU types
+    const baseConsumption = {
+      'AHU-1A': 45, // kWh per period (15 minutes)
+      'AHU-1B': 42,
+      'AHU-2A': 38,
+      'AHU-2B': 40,
+      'AHU-3A': 35,
+      'AHU-3B': 37
+    };
+    
+    const kwhPerPeriod = baseConsumption[systemName as keyof typeof baseConsumption] || 40;
+    const totalKwh = kwhPerPeriod * span;
+    
+    // Use tiered pricing (simplified - could be enhanced with real rate data)
+    const pricePerKwh = 0.12; // Average rate per kWh
+    const estimatedSavings = totalKwh * pricePerKwh;
+    
+    return {
+      kwh: totalKwh,
+      savings: estimatedSavings
+    };
+  };
 
   // Group consecutive periods for each system
   const groupConsecutivePeriods = (schedules: AHUSchedule[]) => {
@@ -224,33 +249,52 @@ export default function AHUMaintenanceSchedule() {
                 {/* Collapsed Period Blocks - Right Column */}
                 <div className="relative">
                   <div className="grid grid-cols-12 gap-1 h-16">
-                    {groups.map((group, groupIndex) => (
-                      <div
-                        key={`${systemName}-group-${groupIndex}`}
-                        className={`p-2 rounded-lg text-center transition-all duration-200 shadow-sm flex flex-col items-center justify-center ${
-                          group.shouldBeOn
-                            ? 'bg-green-100 border-2 border-green-400 text-green-800'
-                            : 'bg-red-100 border-2 border-red-400 text-red-800'
-                        }`}
-                        style={{
-                          gridColumnStart: group.startIndex + 1,
-                          gridColumnEnd: group.endIndex + 2
-                        }}
-                        title={`${group.timeRange}: ${group.shouldBeOn ? 'ON' : 'OFF'}${group.hasClass ? ' (Class Active)' : ' (No Class)'}`}
-                      >
-                        {group.shouldBeOn ? (
-                          <Power className="w-4 h-4 text-green-600 mb-1" />
-                        ) : (
-                          <PowerOff className="w-4 h-4 text-red-600 mb-1" />
-                        )}
-                        <div className="text-xs font-semibold">
-                          {group.shouldBeOn ? 'ON' : 'OFF'}
+                    {groups.map((group, groupIndex) => {
+                      const savings = !group.shouldBeOn ? calculateSavings(group.span, systemName) : null;
+                      
+                      return (
+                        <div
+                          key={`${systemName}-group-${groupIndex}`}
+                          className={`p-2 rounded-lg text-center transition-all duration-200 shadow-sm flex items-center justify-between ${
+                            group.shouldBeOn
+                              ? 'bg-green-100 border-2 border-green-400 text-green-800'
+                              : 'bg-red-100 border-2 border-red-400 text-red-800'
+                          }`}
+                          style={{
+                            gridColumnStart: group.startIndex + 1,
+                            gridColumnEnd: group.endIndex + 2
+                          }}
+                          title={`${group.timeRange}: ${group.shouldBeOn ? 'ON' : 'OFF'}${group.hasClass ? ' (Class Active)' : ' (No Class)'}${
+                            savings ? ` - Estimated Savings: $${savings.savings.toFixed(2)} (${savings.kwh} kWh)` : ''
+                          }`}
+                        >
+                          {!group.shouldBeOn && savings ? (
+                            // OFF period with savings display
+                            <>
+                              <div className="flex flex-col items-start text-left flex-1">
+                                <div className="text-xs font-bold text-green-700">
+                                  +${savings.savings.toFixed(0)}
+                                </div>
+                                <div className="text-xs opacity-75">
+                                  {savings.kwh}kWh
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-center">
+                                <PowerOff className="w-4 h-4 text-red-600 mb-1" />
+                                <div className="text-xs font-semibold">OFF</div>
+                              </div>
+                            </>
+                          ) : (
+                            // ON period - standard display
+                            <div className="flex flex-col items-center justify-center w-full">
+                              <Power className="w-4 h-4 text-green-600 mb-1" />
+                              <div className="text-xs font-semibold">ON</div>
+                              <div className="text-xs opacity-75">{group.span}p</div>
+                            </div>
+                          )}
                         </div>
-                        <div className="text-xs opacity-75">
-                          {group.span}p
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -260,21 +304,78 @@ export default function AHUMaintenanceSchedule() {
       </div>
 
       {/* Enhanced Legend */}
-      <div className="mt-6 flex items-center justify-center gap-8 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-green-100 border-2 border-green-400 rounded flex items-center justify-center">
-            <Power className="w-4 h-4 text-green-600" />
+      <div className="mt-6 space-y-3">
+        <div className="flex items-center justify-center gap-8 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-green-100 border-2 border-green-400 rounded flex items-center justify-center">
+              <Power className="w-4 h-4 text-green-600" />
+            </div>
+            <span className="text-gray-600">AHU ON (Class Active)</span>
           </div>
-          <span className="text-gray-600">AHU ON (Class Active)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-red-100 border-2 border-red-400 rounded flex items-center justify-center">
-            <PowerOff className="w-4 h-4 text-red-600" />
+          <div className="flex items-center gap-2">
+            <div className="w-12 h-6 bg-red-100 border-2 border-red-400 rounded flex items-center justify-between px-1">
+              <span className="text-xs font-bold text-green-700">+$</span>
+              <PowerOff className="w-3 h-3 text-red-600" />
+            </div>
+            <span className="text-gray-600">AHU OFF (Energy Saving + Cost Savings)</span>
           </div>
-          <span className="text-gray-600">AHU OFF (Energy Saving)</span>
         </div>
-        <div className="text-gray-500 text-xs">
-          * Consecutive periods are grouped into single blocks for better cost impact visualization
+        
+        <div className="text-center">
+          <div className="text-gray-500 text-xs mb-1">
+            * Consecutive periods are grouped into single blocks for better cost impact visualization
+          </div>
+          <div className="text-gray-500 text-xs">
+            * OFF periods show estimated savings: dollar amount (left) + energy saved (kWh)
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Savings Summary */}
+      <div className="mt-6 bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border border-green-200">
+        <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <DollarSign className="w-4 h-4 text-green-600" />
+          Daily Savings Summary - Building {activeBuilding}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {Object.entries(systemGroups).map(([systemName, schedules]) => {
+            const groups = groupConsecutivePeriods(schedules);
+            const offGroups = groups.filter(g => !g.shouldBeOn);
+            const totalSavings = offGroups.reduce((sum, group) => {
+              const savings = calculateSavings(group.span, systemName);
+              return sum + savings.savings;
+            }, 0);
+            const totalKwh = offGroups.reduce((sum, group) => {
+              const savings = calculateSavings(group.span, systemName);
+              return sum + savings.kwh;
+            }, 0);
+            
+            return (
+              <div key={systemName} className="bg-white p-3 rounded border">
+                <div className="font-medium text-gray-700 mb-1">{systemName}</div>
+                <div className="text-lg font-bold text-green-600">+${totalSavings.toFixed(2)}</div>
+                <div className="text-xs text-gray-500">{totalKwh} kWh saved</div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <div className="mt-4 pt-3 border-t border-green-200">
+          <div className="text-center">
+            <div className="text-lg font-bold text-green-700">
+              Total Daily Savings: +${Object.entries(systemGroups).reduce((total, [systemName, schedules]) => {
+                const groups = groupConsecutivePeriods(schedules);
+                const offGroups = groups.filter(g => !g.shouldBeOn);
+                return total + offGroups.reduce((sum, group) => {
+                  const savings = calculateSavings(group.span, systemName);
+                  return sum + savings.savings;
+                }, 0);
+              }, 0).toFixed(2)}
+            </div>
+            <div className="text-sm text-gray-600">
+              Estimated savings from optimized AHU scheduling
+            </div>
+          </div>
         </div>
       </div>
 
