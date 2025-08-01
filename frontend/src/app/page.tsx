@@ -14,7 +14,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-3">
               <Activity className="w-8 h-8 text-blue-600" />
               <h1 className="text-2xl font-bold text-gray-900">
-                Energy Efficiency Dashboard
+                Wattson CSUSD Dashboard
               </h1>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500">

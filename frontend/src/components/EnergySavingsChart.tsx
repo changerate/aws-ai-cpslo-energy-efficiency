@@ -497,7 +497,7 @@ export default function EnergySavingsChart() {
                 savingsData.comparison === 'better' ? 'text-green-800' : 'text-red-800'
               }`}>
                 {savingsData.comparison === 'better' 
-                  ? `Excellent! The energy efficiency system has reduced usage by ${Math.abs(savingsData.savings.absolute)} kWh compared to last year.`
+                  ? `Excellent! The Wattson CSUSD system has reduced usage by ${Math.abs(savingsData.savings.absolute)} kWh compared to last year.`
                   : `Energy usage has increased by ${Math.abs(savingsData.savings.absolute)} kWh compared to last year. Consider system optimization.`
                 }
               </span>

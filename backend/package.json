@@ -1,7 +1,7 @@
 {
   "name": "aws-ai-energy-efficiency-backend",
   "version": "1.0.0",
-  "description": "Backend API for AWS AI Energy Efficiency platform",
+  "description": "Backend API for AWS AI Wattson CSUSD platform",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
