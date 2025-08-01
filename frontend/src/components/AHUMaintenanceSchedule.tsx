@@ -209,7 +209,7 @@ export default function AHUMaintenanceSchedule() {
       </div>
 
       {/* Schedule Grid - Enhanced with Collapsed Periods */}
-      <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+      <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
         <div className="min-w-full">
           {/* Header */}
           <div className="grid grid-cols-[200px_1fr] gap-4 mb-4 items-end">
@@ -226,7 +226,7 @@ export default function AHUMaintenanceSchedule() {
               </div>
               <div className="grid grid-cols-12 gap-1 text-xs text-gray-600">
                 {timeSlots.slice(0, 12).map((timeSlot, index) => (
-                  <div key={timeSlot} className="text-center p-1 bg-gray-100 rounded border">
+                  <div key={timeSlot} className="text-center p-1 bg-gray-100 rounded border h-6 flex items-center justify-center">
                     {timeSlot}
                   </div>
                 ))}
@@ -247,58 +247,55 @@ export default function AHUMaintenanceSchedule() {
                     {systemName}
                   </div>
                   
-                  {/* Collapsed Period Blocks - Right Column */}
-                  <div className="relative h-20 bg-white rounded border-2 border-gray-200">
-                    <div className="grid grid-cols-12 gap-1 h-full p-1">
-                      {groups.map((group, groupIndex) => {
-                        const savings = !group.shouldBeOn ? calculateSavings(group.span, systemName) : null;
-                        
-                        return (
-                          <div
-                            key={`${systemName}-group-${groupIndex}`}
-                            className={`rounded-lg transition-all duration-200 shadow-sm flex items-center justify-center ${
-                              group.shouldBeOn
-                                ? 'bg-green-100 border-2 border-green-400 text-green-800'
-                                : 'bg-red-100 border-2 border-red-400 text-red-800'
-                            }`}
-                            style={{
-                              gridColumnStart: group.startIndex + 1,
-                              gridColumnEnd: group.endIndex + 2,
-                              minHeight: 'calc(100% - 8px)',
-                              margin: '4px 0'
-                            }}
-                            title={`${group.timeRange}: ${group.shouldBeOn ? 'ON' : 'OFF'}${group.hasClass ? ' (Class Active)' : ' (No Class)'}${
-                              savings ? ` - Estimated Savings: $${savings.savings.toFixed(2)} (${savings.kwh} kWh)` : ''
-                            }`}
-                          >
-                            {!group.shouldBeOn && savings ? (
-                              // OFF period with savings display
-                              <div className="flex items-center justify-between w-full px-2">
-                                <div className="flex flex-col items-start text-left">
-                                  <div className="text-sm font-bold text-green-700">
-                                    +${savings.savings.toFixed(0)}
-                                  </div>
-                                  <div className="text-xs opacity-75">
-                                    {savings.kwh}kWh
-                                  </div>
+                  {/* Collapsed Period Blocks - Right Column (No Container Box) */}
+                  <div className="grid grid-cols-12 gap-1 h-20">
+                    {groups.map((group, groupIndex) => {
+                      const savings = !group.shouldBeOn ? calculateSavings(group.span, systemName) : null;
+                      
+                      return (
+                        <div
+                          key={`${systemName}-group-${groupIndex}`}
+                          className={`rounded-lg transition-all duration-200 shadow-sm flex items-center justify-center ${
+                            group.shouldBeOn
+                              ? 'bg-green-100 border-2 border-green-400 text-green-800'
+                              : 'bg-red-100 border-2 border-red-400 text-red-800'
+                          }`}
+                          style={{
+                            gridColumnStart: group.startIndex + 1,
+                            gridColumnEnd: group.endIndex + 2,
+                            height: '100%'
+                          }}
+                          title={`${group.timeRange}: ${group.shouldBeOn ? 'ON' : 'OFF'}${group.hasClass ? ' (Class Active)' : ' (No Class)'}${
+                            savings ? ` - Estimated Savings: $${savings.savings.toFixed(2)} (${savings.kwh} kWh)` : ''
+                          }`}
+                        >
+                          {!group.shouldBeOn && savings ? (
+                            // OFF period with savings display
+                            <div className="flex items-center justify-between w-full px-2">
+                              <div className="flex flex-col items-start text-left">
+                                <div className="text-sm font-bold text-green-700">
+                                  +${savings.savings.toFixed(0)}
                                 </div>
-                                <div className="flex flex-col items-center">
-                                  <PowerOff className="w-5 h-5 text-red-600 mb-1" />
-                                  <div className="text-xs font-semibold">OFF</div>
+                                <div className="text-xs opacity-75">
+                                  {savings.kwh}kWh
                                 </div>
                               </div>
-                            ) : (
-                              // ON period - standard display
-                              <div className="flex flex-col items-center justify-center">
-                                <Power className="w-5 h-5 text-green-600 mb-1" />
-                                <div className="text-xs font-semibold">ON</div>
-                                <div className="text-xs opacity-75">{group.span}p</div>
+                              <div className="flex flex-col items-center">
+                                <PowerOff className="w-5 h-5 text-red-600 mb-1" />
+                                <div className="text-xs font-semibold">OFF</div>
                               </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                            </div>
+                          ) : (
+                            // ON period - standard display
+                            <div className="flex flex-col items-center justify-center">
+                              <Power className="w-5 h-5 text-green-600 mb-1" />
+                              <div className="text-xs font-semibold">ON</div>
+                              <div className="text-xs opacity-75">{group.span}p</div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
