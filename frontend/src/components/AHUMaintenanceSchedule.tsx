@@ -77,6 +77,72 @@ export default function AHUMaintenanceSchedule() {
     );
   }
 
+  // Group consecutive periods for each system
+  const groupConsecutivePeriods = (schedules: AHUSchedule[]) => {
+    const timeSlotSubset = timeSlots.slice(0, 12);
+    
+    type GroupType = {
+      startIndex: number;
+      endIndex: number;
+      span: number;
+      shouldBeOn: boolean;
+      hasClass: boolean;
+      timeRange: string;
+    };
+    
+    const groups: GroupType[] = [];
+    
+    type CurrentGroupType = {
+      startIndex: number;
+      shouldBeOn: boolean;
+      hasClass: boolean;
+    };
+    
+    let currentGroup: CurrentGroupType | null = null;
+    
+    timeSlotSubset.forEach((timeSlot, index) => {
+      const schedule = schedules.find(s => s.timeSlot === timeSlot);
+      const shouldBeOn = schedule?.shouldBeOn || false;
+      const hasClass = schedule?.hasActiveClass || false;
+      
+      if (!currentGroup || currentGroup.shouldBeOn !== shouldBeOn) {
+        // Start a new group
+        if (currentGroup) {
+          // Close the previous group
+          groups.push({
+            startIndex: currentGroup.startIndex,
+            endIndex: index - 1,
+            span: index - currentGroup.startIndex,
+            shouldBeOn: currentGroup.shouldBeOn,
+            hasClass: currentGroup.hasClass,
+            timeRange: `${timeSlotSubset[currentGroup.startIndex]} - ${timeSlotSubset[index - 1]}`
+          });
+        }
+        
+        currentGroup = {
+          startIndex: index,
+          shouldBeOn,
+          hasClass
+        } as CurrentGroupType;
+      }
+    });
+    
+    // Close the final group
+    if (currentGroup) {
+      const finalGroup = currentGroup as CurrentGroupType;
+      groups.push({
+        startIndex: finalGroup.startIndex,
+        endIndex: timeSlotSubset.length - 1,
+        span: timeSlotSubset.length - finalGroup.startIndex,
+        shouldBeOn: finalGroup.shouldBeOn,
+        hasClass: finalGroup.hasClass,
+        timeRange: `${timeSlotSubset[finalGroup.startIndex]} - ${timeSlotSubset[timeSlotSubset.length - 1]}`
+      });
+    }
+    
+    return groups;
+  };
+
   return (
     <div className="bg-white p-8 rounded-lg shadow-xl border-2 border-blue-100">
       <div className="flex items-center justify-between mb-6">
@@ -117,73 +183,98 @@ export default function AHUMaintenanceSchedule() {
         })}
       </div>
 
-      {/* Schedule Grid - Enhanced */}
+      {/* Schedule Grid - Enhanced with Collapsed Periods */}
       <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
         <div className="min-w-full">
           {/* Header */}
-          <div className="grid grid-cols-[140px_repeat(auto-fit,minmax(70px,1fr))] gap-2 mb-3">
+          <div className="grid grid-cols-[200px_1fr] gap-4 mb-4">
+            {/* System Label Header */}
             <div className="font-bold text-gray-800 p-3 bg-white rounded shadow-sm">
               <Clock className="w-4 h-4 inline mr-2" />
               AHU System
             </div>
-            {timeSlots.slice(0, 12).map((timeSlot) => (
-              <div key={timeSlot} className="text-sm font-semibold text-gray-700 p-2 text-center bg-white rounded shadow-sm">
-                {timeSlot}
+            
+            {/* Time Slots Header */}
+            <div>
+              <div className="font-semibold text-gray-700 p-2 bg-white rounded shadow-sm mb-2 text-center">
+                Schedule Timeline - Consecutive Periods Grouped
               </div>
-            ))}
+              <div className="grid grid-cols-12 gap-1 text-xs text-gray-600">
+                {timeSlots.slice(0, 12).map((timeSlot, index) => (
+                  <div key={timeSlot} className="text-center p-1">
+                    {timeSlot}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* AHU Systems Rows */}
-          {Object.entries(systemGroups).map(([systemName, schedules]) => (
-            <div key={systemName} className="grid grid-cols-[140px_repeat(auto-fit,minmax(70px,1fr))] gap-2 mb-2">
-              {/* System Name */}
-              <div className="font-semibold text-gray-800 p-3 bg-white rounded shadow-sm flex items-center">
-                <Settings className="w-4 h-4 mr-2" />
-                {systemName}
-              </div>
-              
-              {/* Time Slot Status */}
-              {timeSlots.slice(0, 12).map((timeSlot) => {
-                const schedule = schedules.find(s => s.timeSlot === timeSlot);
-                const shouldBeOn = schedule?.shouldBeOn || false;
-                const hasClass = schedule?.hasActiveClass || false;
+          {/* AHU Systems Rows with Collapsed Periods */}
+          {Object.entries(systemGroups).map(([systemName, schedules]) => {
+            const groups = groupConsecutivePeriods(schedules);
+            
+            return (
+              <div key={systemName} className="grid grid-cols-[200px_1fr] gap-4 mb-3">
+                {/* System Name - Left Column */}
+                <div className="font-semibold text-gray-800 p-3 bg-white rounded shadow-sm flex items-center">
+                  <Settings className="w-4 h-4 mr-2" />
+                  {systemName}
+                </div>
                 
-                return (
-                  <div
-                    key={`${systemName}-${timeSlot}`}
-                    className={`p-3 rounded-lg text-center transition-all duration-200 shadow-sm ${
-                      shouldBeOn
-                        ? 'bg-green-100 border-2 border-green-400 text-green-800'
-                        : 'bg-red-100 border-2 border-red-400 text-red-800'
-                    }`}
-                    title={`${timeSlot}: ${shouldBeOn ? 'ON' : 'OFF'}${hasClass ? ' (Class Active)' : ' (No Class)'}`}
-                  >
-                    {shouldBeOn ? (
-                      <Power className="w-4 h-4 text-green-600 mx-auto" />
-                    ) : (
-                      <PowerOff className="w-4 h-4 text-red-600 mx-auto" />
-                    )}
+                {/* Collapsed Period Blocks - Right Column */}
+                <div className="relative">
+                  <div className="grid grid-cols-12 gap-1 h-16">
+                    {groups.map((group, groupIndex) => (
+                      <div
+                        key={`${systemName}-group-${groupIndex}`}
+                        className={`p-2 rounded-lg text-center transition-all duration-200 shadow-sm flex flex-col items-center justify-center ${
+                          group.shouldBeOn
+                            ? 'bg-green-100 border-2 border-green-400 text-green-800'
+                            : 'bg-red-100 border-2 border-red-400 text-red-800'
+                        }`}
+                        style={{
+                          gridColumnStart: group.startIndex + 1,
+                          gridColumnEnd: group.endIndex + 2
+                        }}
+                        title={`${group.timeRange}: ${group.shouldBeOn ? 'ON' : 'OFF'}${group.hasClass ? ' (Class Active)' : ' (No Class)'}`}
+                      >
+                        {group.shouldBeOn ? (
+                          <Power className="w-4 h-4 text-green-600 mb-1" />
+                        ) : (
+                          <PowerOff className="w-4 h-4 text-red-600 mb-1" />
+                        )}
+                        <div className="text-xs font-semibold">
+                          {group.shouldBeOn ? 'ON' : 'OFF'}
+                        </div>
+                        <div className="text-xs opacity-75">
+                          {group.span}p
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="mt-6 flex items-center justify-center gap-6 text-sm">
+      {/* Enhanced Legend */}
+      <div className="mt-6 flex items-center justify-center gap-8 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-100 border border-green-300 rounded flex items-center justify-center">
-            <Power className="w-3 h-3 text-green-600" />
+          <div className="w-6 h-6 bg-green-100 border-2 border-green-400 rounded flex items-center justify-center">
+            <Power className="w-4 h-4 text-green-600" />
           </div>
           <span className="text-gray-600">AHU ON (Class Active)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-red-100 border border-red-300 rounded flex items-center justify-center">
-            <PowerOff className="w-3 h-3 text-red-600" />
+          <div className="w-6 h-6 bg-red-100 border-2 border-red-400 rounded flex items-center justify-center">
+            <PowerOff className="w-4 h-4 text-red-600" />
           </div>
-          <span className="text-gray-600">AHU OFF (Safe to Maintain)</span>
+          <span className="text-gray-600">AHU OFF (Energy Saving)</span>
+        </div>
+        <div className="text-gray-500 text-xs">
+          * Consecutive periods are grouped into single blocks for better cost impact visualization
         </div>
       </div>
 
