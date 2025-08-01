@@ -368,19 +368,39 @@ export default function AHUMaintenanceSchedule() {
         </div>
         
         <div className="mt-4 pt-3 border-t border-green-200">
-          <div className="text-center">
-            <div className="text-lg font-bold text-green-700">
-              Total Daily Savings: +${Object.entries(systemGroups).reduce((total, [systemName, schedules]) => {
-                const groups = groupConsecutivePeriods(schedules);
-                const offGroups = groups.filter(g => !g.shouldBeOn);
-                return total + offGroups.reduce((sum, group) => {
-                  const savings = calculateSavings(group.span, systemName);
-                  return sum + savings.savings;
-                }, 0);
-              }, 0).toFixed(2)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Total Daily Savings - Left Side */}
+            <div className="text-center">
+              <div className="text-lg font-bold text-green-700">
+                Total Daily Savings: +${Object.entries(systemGroups).reduce((total, [systemName, schedules]) => {
+                  const groups = groupConsecutivePeriods(schedules);
+                  const offGroups = groups.filter(g => !g.shouldBeOn);
+                  return total + offGroups.reduce((sum, group) => {
+                    const savings = calculateSavings(group.span, systemName);
+                    return sum + savings.savings;
+                  }, 0);
+                }, 0).toFixed(2)}
+              </div>
+              <div className="text-sm text-gray-600">
+                Estimated savings from optimized AHU scheduling
+              </div>
             </div>
-            <div className="text-sm text-gray-600">
-              Estimated savings from optimized AHU scheduling
+            
+            {/* YTD Savings - Right Side */}
+            <div className="text-center">
+              <div className="text-lg font-bold text-green-700">
+                YTD Savings: +${(Object.entries(systemGroups).reduce((total, [systemName, schedules]) => {
+                  const groups = groupConsecutivePeriods(schedules);
+                  const offGroups = groups.filter(g => !g.shouldBeOn);
+                  return total + offGroups.reduce((sum, group) => {
+                    const savings = calculateSavings(group.span, systemName);
+                    return sum + savings.savings;
+                  }, 0);
+                }, 0) * 365).toFixed(0)}
+              </div>
+              <div className="text-sm text-gray-600">
+                Estimated savings from optimized AHU scheduling
+              </div>
             </div>
           </div>
         </div>
