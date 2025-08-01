@@ -140,9 +140,6 @@ export default function AHUMaintenanceSchedule() {
               <div className="font-semibold text-gray-800 p-3 bg-white rounded shadow-sm flex items-center">
                 <Settings className="w-4 h-4 mr-2" />
                 {systemName}
-                <div className="text-xs text-gray-500 ml-2">
-                  Zone {systemName.split('-')[1]}
-                </div>
               </div>
               
               {/* Time Slot Status */}
