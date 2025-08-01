@@ -32,11 +32,16 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-lg shadow-lg">
             <h2 className="text-3xl font-bold mb-2">Welcome to the Energy Dashboard</h2>
             <p className="text-blue-100">
-              Monitor energy usage, track savings vs last year, manage HVAC maintenance, and view electricity rates across campus buildings.
+              Monitor HVAC maintenance schedules, track energy usage and savings, with real-time data from your CSV files.
             </p>
           </div>
 
-          {/* Charts Grid */}
+          {/* HVAC Maintenance Schedule - Full Width at Top */}
+          <div className="w-full">
+            <HVACMaintenanceSchedule />
+          </div>
+
+          {/* Energy Analysis Grid - Two Main Modules */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Energy Usage Chart */}
             <div className="lg:col-span-1">
@@ -47,43 +52,38 @@ export default function Dashboard() {
             <div className="lg:col-span-1">
               <EnergySavingsChart />
             </div>
+          </div>
 
-            {/* Rate Data Chart */}
-            <div className="lg:col-span-1">
-              <RateDataChart />
-            </div>
-
-            {/* HVAC Maintenance Schedule */}
-            <div className="lg:col-span-1">
-              <HVACMaintenanceSchedule />
-            </div>
+          {/* Electricity Rates - Minimized at Bottom */}
+          <div className="w-full">
+            <RateDataChart />
           </div>
 
           {/* Footer Info */}
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
               <div>
+                <h3 className="font-semibold text-gray-700 mb-2">HVAC Maintenance</h3>
+                <p className="text-sm text-gray-500">
+                  Primary focus: Track HVAC system schedules across campus buildings to optimize maintenance timing and prevent downtime.
+                </p>
+              </div>
+              <div>
                 <h3 className="font-semibold text-gray-700 mb-2">Energy Usage</h3>
                 <p className="text-sm text-gray-500">
-                  Monitor real-time energy consumption with historical data from your CSV files.
+                  Monitor real-time energy consumption with historical data from your CSV files for comprehensive analysis.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700 mb-2">Savings Analysis</h3>
                 <p className="text-sm text-gray-500">
-                  Compare current energy usage with the same period last year to track savings and efficiency improvements.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-700 mb-2">HVAC Maintenance</h3>
-                <p className="text-sm text-gray-500">
-                  Track HVAC system schedules across campus buildings to optimize maintenance timing.
+                  Compare current energy usage with the same period last year to track efficiency improvements and cost savings.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700 mb-2">Electricity Rates</h3>
                 <p className="text-sm text-gray-500">
-                  View current electricity rates by tier to understand cost implications and optimize usage timing.
+                  Reference current electricity rates by tier for cost calculations and budget planning.
                 </p>
               </div>
             </div>

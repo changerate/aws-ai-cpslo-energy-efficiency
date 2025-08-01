@@ -78,40 +78,56 @@ export default function HVACMaintenanceSchedule() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-        <Settings className="w-5 h-5" />
-        HVAC Maintenance Schedule
-      </h2>
+    <div className="bg-white p-8 rounded-lg shadow-xl border-2 border-blue-100">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold flex items-center gap-3">
+          <Settings className="w-6 h-6 text-blue-600" />
+          HVAC Maintenance Schedule
+        </h2>
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
+          <Clock className="w-4 h-4" />
+          <span>Real-time Status</span>
+        </div>
+      </div>
       
-      {/* Building Tabs */}
-      <div className="flex border-b border-gray-200 mb-6">
-        {buildings.map((building) => (
-          <button
-            key={building}
-            onClick={() => setActiveBuilding(building)}
-            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-              activeBuilding === building
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            Building {building}
-          </button>
-        ))}
+      {/* Building Tabs - Enhanced */}
+      <div className="flex border-b-2 border-gray-200 mb-6">
+        {buildings.map((building) => {
+          const systemCount = [...new Set(scheduleData
+            .filter(s => s.buildingNumber === building)
+            .map(s => s.systemName)
+          )].length;
+          
+          return (
+            <button
+              key={building}
+              onClick={() => setActiveBuilding(building)}
+              className={`px-6 py-3 font-semibold text-base border-b-4 transition-all duration-200 ${
+                activeBuilding === building
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              Building {building}
+              <div className="text-xs mt-1 opacity-75">
+                {systemCount} Systems
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Schedule Grid */}
-      <div className="overflow-x-auto">
+      {/* Schedule Grid - Enhanced */}
+      <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
         <div className="min-w-full">
           {/* Header */}
-          <div className="grid grid-cols-[120px_repeat(auto-fit,minmax(60px,1fr))] gap-1 mb-2">
-            <div className="font-semibold text-gray-700 p-2">
-              <Clock className="w-4 h-4 inline mr-1" />
-              System
+          <div className="grid grid-cols-[140px_repeat(auto-fit,minmax(70px,1fr))] gap-2 mb-3">
+            <div className="font-bold text-gray-800 p-3 bg-white rounded shadow-sm">
+              <Clock className="w-4 h-4 inline mr-2" />
+              HVAC System
             </div>
             {timeSlots.slice(0, 12).map((timeSlot) => (
-              <div key={timeSlot} className="text-xs font-medium text-gray-600 p-1 text-center">
+              <div key={timeSlot} className="text-sm font-semibold text-gray-700 p-2 text-center bg-white rounded shadow-sm">
                 {timeSlot}
               </div>
             ))}
@@ -119,11 +135,14 @@ export default function HVACMaintenanceSchedule() {
 
           {/* HVAC Systems Rows */}
           {Object.entries(systemGroups).map(([systemName, schedules]) => (
-            <div key={systemName} className="grid grid-cols-[120px_repeat(auto-fit,minmax(60px,1fr))] gap-1 mb-1">
+            <div key={systemName} className="grid grid-cols-[140px_repeat(auto-fit,minmax(70px,1fr))] gap-2 mb-2">
               {/* System Name */}
-              <div className="font-medium text-gray-800 p-2 bg-gray-50 rounded flex items-center">
-                <Settings className="w-3 h-3 mr-1" />
+              <div className="font-semibold text-gray-800 p-3 bg-white rounded shadow-sm flex items-center">
+                <Settings className="w-4 h-4 mr-2" />
                 {systemName}
+                <div className="text-xs text-gray-500 ml-2">
+                  Zone {systemName.split('-')[1]}
+                </div>
               </div>
               
               {/* Time Slot Status */}
@@ -135,10 +154,10 @@ export default function HVACMaintenanceSchedule() {
                 return (
                   <div
                     key={`${systemName}-${timeSlot}`}
-                    className={`p-2 rounded text-center transition-colors ${
+                    className={`p-3 rounded-lg text-center transition-all duration-200 shadow-sm ${
                       shouldBeOn
-                        ? 'bg-green-100 border border-green-300'
-                        : 'bg-red-100 border border-red-300'
+                        ? 'bg-green-100 border-2 border-green-400 text-green-800'
+                        : 'bg-red-100 border-2 border-red-400 text-red-800'
                     }`}
                     title={`${timeSlot}: ${shouldBeOn ? 'ON' : 'OFF'}${hasClass ? ' (Class Active)' : ' (No Class)'}`}
                   >

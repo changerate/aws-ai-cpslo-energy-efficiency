@@ -2,21 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DollarSign, Info } from 'lucide-react';
+import { DollarSign, TrendingUp } from 'lucide-react';
 import { RateData } from '@/types';
 import { fetchRateData } from '@/services/api';
 
 export default function RateDataChart() {
-  const [rates, setRates] = useState<RateData[]>([]);
+  const [rateData, setRateData] = useState<RateData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
       try {
+        setLoading(true);
         const response = await fetchRateData();
         if (response.success) {
-          setRates(response.data);
+          setRateData(response.data);
         } else {
           setError('Failed to load rate data');
         }
@@ -31,29 +32,15 @@ export default function RateDataChart() {
     loadData();
   }, []);
 
-  // Transform data for chart
-  const chartData = rates.map(rate => ({
-    tier: rate.rateTier,
-    price: rate.pricePerKwh,
-    description: rate.description
-  }));
-
-  // Get color based on price level
-  const getBarColor = (price: number) => {
-    if (price >= 0.3) return '#ef4444'; // Red for high prices
-    if (price >= 0.2) return '#f59e0b'; // Orange for medium prices
-    return '#10b981'; // Green for low prices
-  };
-
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5" />
+      <div className="bg-white p-4 rounded-lg shadow-lg">
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+          <DollarSign className="w-4 h-4" />
           Electricity Rates
         </h2>
         <div className="animate-pulse">
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
         </div>
       </div>
     );
@@ -61,65 +48,81 @@ export default function RateDataChart() {
 
   if (error) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5" />
+      <div className="bg-white p-4 rounded-lg shadow-lg">
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+          <DollarSign className="w-4 h-4" />
           Electricity Rates
         </h2>
-        <div className="text-red-500">Error: {error}</div>
+        <div className="text-red-500 text-sm">Error: {error}</div>
       </div>
     );
   }
 
+  // Calculate statistics
+  const avgRate = rateData.length > 0 ? rateData.reduce((sum, rate) => sum + rate.pricePerKwh, 0) / rateData.length : 0;
+  const maxRate = Math.max(...rateData.map(rate => rate.pricePerKwh));
+  const minRate = Math.min(...rateData.map(rate => rate.pricePerKwh));
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-        <DollarSign className="w-5 h-5" />
-        Electricity Rates
-      </h2>
+    <div className="bg-white p-4 rounded-lg shadow-lg">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-bold flex items-center gap-2">
+          <DollarSign className="w-4 h-4" />
+          Electricity Rates
+        </h2>
+        <div className="text-sm text-gray-500">
+          Current Pricing Tiers
+        </div>
+      </div>
       
-      {/* Chart */}
-      <div className="h-64 mb-6">
+      {/* Compact Statistics */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="text-center">
+          <div className="text-lg font-bold text-green-600">${minRate.toFixed(3)}</div>
+          <div className="text-xs text-gray-500">Min Rate</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-blue-600">${avgRate.toFixed(3)}</div>
+          <div className="text-xs text-gray-500">Avg Rate</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-red-600">${maxRate.toFixed(3)}</div>
+          <div className="text-xs text-gray-500">Peak Rate</div>
+        </div>
+      </div>
+      
+      {/* Compact Chart */}
+      <div className="h-32">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
+          <BarChart data={rateData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="tier" 
-              angle={-45}
-              textAnchor="end"
-              height={80}
+              dataKey="rateTier" 
+              tick={{ fontSize: 10 }}
             />
-            <YAxis label={{ value: '$/kWh', angle: -90, position: 'insideLeft' }} />
+            <YAxis 
+              tick={{ fontSize: 10 }}
+              label={{ value: '$/kWh', angle: -90, position: 'insideLeft', style: { fontSize: '10px' } }}
+            />
             <Tooltip 
-              formatter={(value: number) => [`$${value.toFixed(3)}/kWh`, 'Price']}
-              labelFormatter={(label) => `Rate Tier: ${label}`}
+              formatter={(value: number) => [`$${value.toFixed(3)}/kWh`, 'Rate']}
+              labelFormatter={(label) => `Tier: ${label}`}
             />
             <Bar 
-              dataKey="price" 
-              fill="#3b82f6"
-              radius={[4, 4, 0, 0]}
+              dataKey="pricePerKwh" 
+              fill="#8884d8"
+              radius={[2, 2, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Rate Details */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-gray-700">Rate Details</h3>
-        {rates.map((rate) => (
-          <div key={rate.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div 
-                className="w-4 h-4 rounded"
-                style={{ backgroundColor: getBarColor(rate.pricePerKwh) }}
-              ></div>
-              <span className="font-medium">{rate.rateTier}</span>
-              <span className="text-2xl font-bold text-green-600">${rate.pricePerKwh.toFixed(3)}/kWh</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Info className="w-4 h-4" />
-              <span>{rate.description}</span>
-            </div>
+      {/* Compact Rate List */}
+      <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        {rateData.map((rate, index) => (
+          <div key={index} className="bg-gray-50 p-2 rounded text-center">
+            <div className="font-medium">{rate.rateTier}</div>
+            <div className="text-gray-600">${rate.pricePerKwh.toFixed(3)}/kWh</div>
           </div>
         ))}
       </div>
