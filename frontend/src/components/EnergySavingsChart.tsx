@@ -112,7 +112,7 @@ export default function EnergySavingsChart() {
       // Populate with actual data
       currentYearData.forEach(d => {
         const date = new Date(d.dateTime);
-        const timeKey = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        const timeKey = `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
         if (fullDayTimeline[timeKey]) {
           fullDayTimeline[timeKey].current.push(d.energyUsedKwh);
         }
@@ -120,7 +120,7 @@ export default function EnergySavingsChart() {
 
       previousYearData.forEach(d => {
         const date = new Date(d.dateTime);
-        const timeKey = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        const timeKey = `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
         if (fullDayTimeline[timeKey]) {
           fullDayTimeline[timeKey].previous.push(d.energyUsedKwh);
         }

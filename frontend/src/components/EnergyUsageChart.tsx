@@ -121,14 +121,14 @@ export default function EnergyUsageChart() {
           })
           .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
         
-        return sortedData.map(usage => ({
-          time: new Date(usage.dateTime).toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          energy: usage.energyUsedKwh,
-          timestamp: usage.dateTime
-        }));
+        return sortedData.map(usage => {
+          const date = new Date(usage.dateTime);
+          return {
+            time: `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`,
+            energy: usage.energyUsedKwh,
+            timestamp: usage.dateTime
+          };
+        });
         
       case 'week':
         // Generate daily data for the week containing our data date
@@ -178,14 +178,14 @@ export default function EnergyUsageChart() {
         return monthData;
         
       default:
-        return baseData.map(usage => ({
-          time: new Date(usage.dateTime).toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          energy: usage.energyUsedKwh,
-          timestamp: usage.dateTime
-        }));
+        return baseData.map(usage => {
+          const date = new Date(usage.dateTime);
+          return {
+            time: `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`,
+            energy: usage.energyUsedKwh,
+            timestamp: usage.dateTime
+          };
+        });
     }
   };
 
@@ -323,10 +323,16 @@ export default function EnergyUsageChart() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="time" 
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 10 }}
                 angle={-45}
                 textAnchor="end"
                 height={60}
+                interval="preserveStartEnd"
+                tickFormatter={(value, index) => {
+                  // Show every 4th tick (every hour) for better readability
+                  if (index % 4 === 0) return value;
+                  return '';
+                }}
               />
               <YAxis 
                 label={{ value: 'kWh', angle: -90, position: 'insideLeft' }}
@@ -341,7 +347,7 @@ export default function EnergyUsageChart() {
                 dataKey="energy" 
                 stroke="#3b82f6" 
                 strokeWidth={3}
-                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 2 }}
                 activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
               />
             </LineChart>
